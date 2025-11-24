@@ -1,0 +1,706 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>異國探索區</title>
+
+<style>
+    /* 基本重置 */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "Helvetica Neue", Arial; background:#fff5e6; color:#333}
+
+    /* 頁首 - 焦糖橘色系 */
+    header{background:#FCC881;padding:18px 24px;border-bottom:3px}
+    .top-row{display:flex;align-items:center;gap:18px}
+    .logo{font-weight:700;color:#CC7304;font-size:30px;font-family:"漢儀新蒂蘇孝慈碑"}
+
+    /* 圓形分類按鈕 */
+    .categories{display:flex;gap:14px;align-items:center}
+    .cat{
+        width:64px;height:64px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        border:3px solid #CC7304;
+        color:#CC7304;
+        font-weight:700;
+        text-decoration:none;
+        transition:0.25s;
+        cursor:pointer;
+    }
+
+    .cat.active{
+        background:#CC7304;
+        color:#fff;
+        border:3px solid #CC7304;
+    }
+
+    /* 彩色 hover 效果 - 為每個分類添加不同顏色 */
+    .cat:nth-child(1):hover{transform:scale(1.1);background:#8B6F47;color:#fff;border:3px solid #8B6F47}
+    .cat:nth-child(2):hover{transform:scale(1.1);background:#F095A7;color:#fff;border:3px solid #F095A7}
+    .cat:nth-child(3):hover{transform:scale(1.1);background:#73E5FC;color:#fff;border:3px solid #73E5FC}
+    .cat:nth-child(4):hover{transform:scale(1.1);background:#F7EE8F;color:#fff;border:3px solid #F7EE8F}
+    .cat:nth-child(5):hover{transform:scale(1.1);background:#6940AB;color:#fff;border:3px solid #6940AB}
+    .cat:nth-child(6):hover{transform:scale(1.1);background:#FC988F;color:#fff;border:3px solid #FC988F}
+    .cat:nth-child(7):hover{transform:scale(1.1);background:#B4D4BA;color:#fff;border:3px solid #B4D4BA}
+
+    .cat.active:hover{
+        transform:scale(1.1);
+        background:#CC7304;
+        color:#fff;
+        border:3px solid #CC7304;
+    }
+
+    /* 篩選列 */
+    .filters{display:flex;flex-wrap: wrap;gap:12px;align-items:center;margin:18px 0;justify-content: center;}
+    .filters select,.filters input{padding:8px 10px;border-radius:8px;border:1px solid #FCC881}
+    .filters button{padding:8px 12px;border-radius:8px;border:none;background:#CC7304;color:#fff; cursor: pointer;}
+    .filters button:hover{background:#a9580a;}
+    .filters select:focus, .filters input:focus{outline: none;border:1px solid #a9580a;}
+
+    /* 主要內容區 - 上部示意區 */
+    .hero{
+          padding:25px;
+          text-align:center;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+        }
+
+    .hero h1{color:#CC7304;margin-bottom:20px;font-size:47px;}
+    .hero p{color:#666; font-size: 16px;}
+
+    /* 下方滑動區：固定高度，垂直滾動；每行兩個卡片 */
+    .scroll-area{
+      height:calc(100vh - 220px);
+      overflow-y:auto;
+      padding:18px 24px 36px;
+      background:linear-gradient(#fff, #fff);
+    }
+
+    /* 使用 grid 兩欄排列，列間縳向延續 */
+    .card-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px}
+
+    /* 卡片 */
+    .card{
+      background:transparent;
+      border-radius:12px;
+      height:420px;
+      position:relative;
+      cursor:pointer;
+      perspective:1000px;
+      transition:transform 0.3s ease;
+    }
+    
+    .card:hover{
+      transform:translateY(-8px);
+    }
+    
+    .card-inner{
+      position:relative;
+      width:100%;
+      height:100%;
+      transition:transform 0.6s;
+      transform-style:preserve-3d;
+    }
+    
+    .card.flipped .card-inner{
+      transform:rotateY(180deg);
+    }
+    
+    .card-front, .card-back{
+      position:absolute;
+      width:100%;
+      height:100%;
+      backface-visibility:hidden;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 6px 18px rgba(11,20,30,0.06);
+      border:1px solid #FCC881;
+    }
+    
+    .card-front{
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+    }
+    
+    .card-back{
+      background:linear-gradient(135deg, #fff 0%, #fff5e6 100%);
+      transform:rotateY(180deg);
+      padding:20px;
+      overflow-y:auto;
+    }
+    
+    .card img{width:100%;height:300px;object-fit:cover;display:block}
+    .card-body{padding:12px;text-align:center;position:relative;}
+    .card-title{font-weight:700;margin-bottom:6px;color:#CC7304;}
+    .card-meta{color:#8a8a8a;font-size:13px}
+    
+    /* 按讚按鈕樣式 */
+    .like-section{margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .like-btn{background:none;border:none;cursor:pointer;font-size:24px;padding:4px 8px;transition:transform 0.2s;display:flex;align-items:center;gap:4px;text-decoration:none;outline:none}
+    .like-btn:hover{transform:scale(1.15)}
+    .like-btn:active{transform:scale(0.95)}
+    .like-btn.liked{animation:likeAnimation 0.3s ease}
+    .like-count{font-size:14px;color:#666;font-weight:600;min-width:30px;text-align:left}
+    @keyframes likeAnimation{
+      0%, 100%{transform:scale(1)}
+      50%{transform:scale(1.3)}
+    }
+    
+    .recipe-title{font-size:18px;font-weight:700;color:#CC7304;margin-bottom:15px;text-align:center}
+    .recipe-section{margin-bottom:15px}
+    .recipe-section h4{font-size:14px;font-weight:700;color:#a9580a;margin-bottom:8px}
+    .recipe-section p, .recipe-section ul{font-size:13px;color:#555;line-height:1.6}
+    .recipe-section ul{padding-left:20px}
+    .recipe-section li{margin-bottom:4px}
+
+    /* 小螢幕下調整為一欄 */
+    @media (max-width:640px){
+      .card-grid{grid-template-columns:1fr}
+      .categories{overflow:auto}
+      .scroll-area{height:calc(100vh - 280px);}
+      .hero h1{font-size:36px;}
+    }
+
+    /* 美化滾動條（桌面瀏覽器支援） */
+    .scroll-area::-webkit-scrollbar{width:10px}
+    .scroll-area::-webkit-scrollbar-track{background:#f0f0f0;border-radius:10px}
+    .scroll-area::-webkit-scrollbar-thumb{background:#FCC881;border-radius:10px}
+    
+    .footer{
+        text-align:center;
+        padding:12px;
+        margin-top:20px;
+        background:#FCC881;
+        color:#4a4a4a;
+        font-size:14px;
+        border-top:2px solid #CC7304;
+    }
+
+</style>
+</head>
+
+<body>
+    <header>
+        <div class="top-row">
+            <div class="logo">今天吃什麼？</div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>異國探索區</h1>
+
+            <div>
+                <nav class="categories" aria-label="分類">
+                    <div class="cat" onclick="location.href='index.html'">首頁</div>
+                    <div class="cat" onclick="location.href='main.html'">主食</div>
+                    <div class="cat" onclick="location.href='drink.html'">飲品</div>
+                    <div class="cat" onclick="location.href='dessert.html'">甜點</div>
+                    <div class="cat" onclick="location.href='weird.html'">怪奇</div>
+                    <div class="cat active">異國</div>
+                    <div class="cat" onclick="location.href='school.html'">公館</div>
+                </nav>
+            </div>
+
+            <div class="filters">
+                <select id="filterCountry">
+                    <option value="">依國家篩選</option>
+                    <option>日本</option>
+                    <option>韓國</option>
+                    <option>義大利</option>
+                    <option>法國</option>
+                    <option>泰國</option>
+                    <option>印度</option>
+                    <option>德國</option>
+                    <option>西班牙</option>
+                    <option>希臘</option>
+                    <option>土耳其</option>
+                    <option>越南</option>
+                    <option>美國</option>
+                </select>
+
+                <input id="q" placeholder="搜尋異國名稱꒰✩´˘`✩꒱" />
+                <button id="searchBtn">搜尋</button>
+                <button id="randBtn">隨機抽選</button>
+            </div>
+            <p>使用上方篩選或搜尋，或按下隨機抽選尋找今日餐點吧！✿</p>
+        </section>
+
+        <section class="scroll-area" id="scrollArea">
+            <div class="card-grid" id="cardGrid">
+                <article class="card">
+                    <img src="照片/異國/Cassoulet（卡蘇萊白豆燉肉）.jpg" alt="卡蘇萊白豆燉肉">
+                    <div class="card-body">
+                        <div class="card-title">卡蘇萊白豆燉肉</div>
+                        <div class="card-meta">法國</div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <img src="照片/異國/Chicken Biryani（印度香料手抓飯）.jpg" alt="印度香料手抓飯">
+                    <div class="card-body">
+                        <div class="card-title">印度香料手抓飯</div>
+                        <div class="card-meta">印度</div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <img src="照片/異國/Currywurst（咖哩香腸）.jpg" alt="咖哩香腸">
+                    <div class="card-body">
+                        <div class="card-title">咖哩香腸</div>
+                        <div class="card-meta">德國</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/Gazpacho（西班牙冷湯）.jpg" alt="西班牙冷湯">
+                    <div class="card-body">
+                        <div class="card-title">西班牙冷湯</div>
+                        <div class="card-meta">西班牙</div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <img src="照片/異國/Gnocchi（義式馬鈴薯糰子）.jpg" alt="義式馬鈴薯糰子">
+                    <div class="card-body">
+                        <div class="card-title">義式馬鈴薯糰子</div>
+                        <div class="card-meta">義大利</div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <img src="照片/異國/Manti（土耳其餃子）.jpg" alt="土耳其餃子">
+                    <div class="card-body">
+                        <div class="card-title">土耳其餃子</div>
+                        <div class="card-meta">土耳其</div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <img src="照片/異國/Palak Paneer（菠菜起司咖哩）.jpg" alt="菠菜起司咖哩">
+                    <div class="card-body">
+                        <div class="card-title">菠菜起司咖哩</div>
+                        <div class="card-meta">印度</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/Quiche（法式鹹派）.jpg" alt="法式鹹派">
+                    <div class="card-body">
+                        <div class="card-title">法式鹹派</div>
+                        <div class="card-meta">法國</div>
+                    </div>
+                </article>
+                        
+                <article class="card">
+                    <img src="照片/異國/Schnitzel（德國炸豬排）.jpg" alt="德國炸豬排">
+                    <div class="card-body">
+                        <div class="card-title">德國炸豬排</div>
+                        <div class="card-meta">德國</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/土耳其烤肉捲（Doner）.jpg" alt="土耳其烤肉捲">
+                    <div class="card-body">
+                        <div class="card-title">土耳其烤肉捲</div>
+                        <div class="card-meta">土耳其</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/日本拉麵.webp" alt="日本拉麵">
+                    <div class="card-body">
+                        <div class="card-title">日本拉麵</div>
+                        <div class="card-meta">日本</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/日本壽司.webp" alt="日本壽司">
+                    <div class="card-body">
+                        <div class="card-title">日本壽司</div>
+                        <div class="card-meta">日本</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/西班牙海鮮燉飯.jpg" alt="西班牙海鮮燉飯">
+                    <div class="card-body">
+                        <div class="card-title">西班牙海鮮燉飯</div>
+                        <div class="card-meta">西班牙</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/希臘牧羊人茄子千層麵（Moussaka）.jpg" alt="希臘牧羊人茄子千層麵">
+                    <div class="card-body">
+                        <div class="card-title">希臘牧羊人茄子千層麵</div>
+                        <div class="card-meta">希臘</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/希臘捲餅 Gyros.jpg" alt="希臘捲餅">
+                    <div class="card-body">
+                        <div class="card-title">希臘捲餅</div>
+                        <div class="card-meta">希臘</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/美式牛排.jpg" alt="美式牛排">
+                    <div class="card-body">
+                        <div class="card-title">美式牛排</div>
+                        <div class="card-meta">美國</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/美國麥當勞.png" alt="美國麥當勞">
+                    <div class="card-body">
+                        <div class="card-title">美國麥當勞</div>
+                        <div class="card-meta">美國</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/泰式冬陰功（Tom Yum Goong）.jpg" alt="泰式冬陰功">
+                    <div class="card-body">
+                        <div class="card-title">泰式冬陰功</div>
+                        <div class="card-meta">泰國</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/泰式打拋豬.jpg" alt="泰式打拋豬">
+                    <div class="card-body">
+                        <div class="card-title">泰式打拋豬</div>
+                        <div class="card-meta">泰國</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/越南煎餅.jpg" alt="越南煎餅">
+                    <div class="card-body">
+                        <div class="card-title">越南煎餅</div>
+                        <div class="card-meta">越南</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/韓式冷麵（Naengmyeon）.jpg" alt="韓式冷麵">
+                    <div class="card-body">
+                        <div class="card-title">韓式冷麵</div>
+                        <div class="card-meta">韓國</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/義大利披薩.jpg" alt="義大利披薩">
+                    <div class="card-body">
+                        <div class="card-title">義大利披薩</div>
+                        <div class="card-meta">義大利</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/韓式拌飯.jpg" alt="韓式拌飯">
+                    <div class="card-body">
+                        <div class="card-title">韓式拌飯</div>
+                        <div class="card-meta">韓國</div>
+                    </div>
+                </article>
+                
+                <article class="card">
+                    <img src="照片/異國/韓式炸雞.jpg" alt="韓式炸雞">
+                    <div class="card-body">
+                        <div class="card-title">韓式炸雞</div>
+                        <div class="card-meta">韓國</div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>SEE YOU SOON ｜ Y-Five ｜ foodie@gmail.com</p>
+        </footer>
+
+    </main>
+
+<script>
+    const LIKE_STORAGE_KEY = 'foreignLikes';
+    let likes = JSON.parse(localStorage.getItem(LIKE_STORAGE_KEY) || '{}');
+    
+    // 異國料理食譜資料庫
+    const foreignRecipes = {
+        '卡蘇萊白豆燉肉': {
+            ingredients: ['白豆', '鴨腿', '豬肉', '香腸', '番茄', '洋蔥', '蒜', '百里香'],
+            steps: ['1. 白豆泡水一夜', '2. 鴨腿豬肉香腸煎香', '3. 加白豆番茄洋蔥', '4. 慢燉2-3小時至軟爛'],
+            tips: '法國西南部傳統菜,燉煮時間要夠長,上桌前烤至表面金黃!'
+        },
+        '印度香料手抓飯': {
+            ingredients: ['印度香米', '雞肉或羊肉', '洋蔥', '番茄', '優格', '印度綜合香料', '番紅花', '葡萄乾', '腰果'],
+            steps: ['1. 肉用優格香料醃製', '2. 洋蔥炒至金黃', '3. 加肉和米分層', '4. 加番紅花水燜煮至熟'],
+            tips: '印度宴客名菜,米要用印度香米,番紅花水增添香氣和顏色!'
+        },
+        '咖哩香腸': {
+            ingredients: ['德國香腸', '咖哩粉', '番茄醬', '洋蔥', '薯條'],
+            steps: ['1. 香腸煎熟後切段', '2. 洋蔥炒香加番茄醬', '3. 加咖哩粉調成醬汁', '4. 淋在香腸上配薯條'],
+            tips: '柏林街頭經典小吃,咖哩醬要濃郁,配薯條最道地!'
+        },
+        '西班牙冷湯': {
+            ingredients: ['番茄', '黃瓜', '甜椒', '洋蔥', '蒜', '橄欖油', '紅酒醋', '麵包'],
+            steps: ['1. 所有蔬菜切塊', '2. 加麵包橄欖油醋', '3. 用攪拌機打成泥狀', '4. 冷藏後冰涼享用'],
+            tips: '夏日消暑聖品,要夠冰才好喝,可加冰塊增加口感!'
+        },
+        '義式馬鈴薯糰子': {
+            ingredients: ['馬鈴薯', '麵粉', '蛋', '帕馬森起司', '奶油', '鼠尾草'],
+            steps: ['1. 馬鈴薯蒸熟壓泥', '2. 加麵粉蛋揉成團', '3. 搓成長條切小塊', '4. 水煮浮起配奶油鼠尾草醬'],
+            tips: '義大利北部家常菜,煮時水要滾,浮起即熟不要煮太久!'
+        },
+        '土耳其餃子': {
+            ingredients: ['麵粉', '羊絞肉', '洋蔥', '優格', '蒜', '辣椒油', '薄荷'],
+            steps: ['1. 麵皮包入羊肉餡', '2. 包成小巧餃子狀', '3. 水煮至浮起撈出', '4. 淋蒜味優格和辣椒油'],
+            tips: '土耳其國民美食,餃子要小,優格醬要夠蒜,辣油要香!'
+        },
+        '菠菜起司咖哩': {
+            ingredients: ['菠菜', '印度起司(Paneer)', '洋蔥', '番茄', '鮮奶油', '印度香料'],
+            steps: ['1. 菠菜燙熟打成泥', '2. 洋蔥番茄炒香', '3. 加香料和菠菜泥', '4. 放入起司塊加鮮奶油'],
+            tips: '印度素食經典,菠菜泥要細滑,起司不要煮太久保持形狀!'
+        },
+        '法式鹹派': {
+            ingredients: ['派皮', '雞蛋', '鮮奶油', '培根', '起司', '洋蔥', '菠菜'],
+            steps: ['1. 派皮鋪入模具', '2. 培根洋蔥炒香', '3. 蛋液加鮮奶油起司', '4. 倒入派皮烤至金黃'],
+            tips: '法國家常料理,餡料可變化,烤到蛋液凝固略焦最好吃!'
+        },
+        '德國炸豬排': {
+            ingredients: ['豬排', '麵粉', '蛋液', '麵包粉', '檸檬', '油'],
+            steps: ['1. 豬排拍薄醃製', '2. 裹麵粉蛋液麵包粉', '3. 油炸至金黃酥脆', '4. 配檸檬角和馬鈴薯沙拉'],
+            tips: '維也納經典,肉要薄,炸到酥脆,擠檸檬汁提味!'
+        },
+        '土耳其烤肉捲': {
+            ingredients: ['羊肉或雞肉', '洋蔥', '番茄', '生菜', '優格醬', '薄餅'],
+            steps: ['1. 肉用香料醃製烤熟', '2. 切薄片', '3. 薄餅包入肉和蔬菜', '4. 淋上優格醬捲起'],
+            tips: '土耳其街頭美食,肉要烤香,配料要豐富,醬汁是靈魂!'
+        },
+        '日本拉麵': {
+            ingredients: ['拉麵', '叉燒肉', '溏心蛋', '筍乾', '海苔', '蔥花', '高湯'],
+            steps: ['1. 豚骨或雞骨熬湯', '2. 拉麵煮熟', '3. 倒入高湯', '4. 擺上配料即可'],
+            tips: '湯頭是關鍵,熬煮時間要夠長,麵條軟硬依個人喜好!'
+        },
+        '日本壽司': {
+            ingredients: ['壽司米', '醋', '糖', '鹽', '生魚片', '海苔', '山葵'],
+            steps: ['1. 米飯煮好拌入壽司醋', '2. 手沾醋水捏飯糰', '3. 放上生魚片', '4. 配山葵醬油食用'],
+            tips: '米飯是靈魂,醋飯要溫不要太冷,魚片要新鮮!'
+        },
+        '西班牙海鮮燉飯': {
+            ingredients: ['米', '蝦', '蛤蠣', '魷魚', '番紅花', '蒜', '檸檬', '高湯'],
+            steps: ['1. 海鮮處理備用', '2. 米和蒜炒香', '3. 加高湯和番紅花', '4. 放海鮮燉煮至米熟'],
+            tips: '番紅花提供黃色和香氣,鍋底微焦的飯(Socarrat)最香!'
+        },
+        '希臘牧羊人茄子千層麵': {
+            ingredients: ['茄子', '羊絞肉', '番茄', '洋蔥', '白醬', '起司', '肉桂'],
+            steps: ['1. 茄子切片煎軟', '2. 羊肉炒香加番茄肉桂', '3. 交疊茄子和肉醬', '4. 淋白醬起司烤至金黃'],
+            tips: '希臘國菜,肉醬要加肉桂是秘訣,白醬要夠濃!'
+        },
+        '希臘捲餅': {
+            ingredients: ['豬肉', '雞肉', '洋蔥', '番茄', '薄餅', 'Tzatziki醬', '薯條'],
+            steps: ['1. 肉串烤熟切片', '2. 薄餅鋪開', '3. 放肉、蔬菜、薯條', '4. 淋Tzatziki醬捲起'],
+            tips: '希臘版沙威瑪,放薯條是特色,Tzatziki優格醬不可少!'
+        },
+        '美式牛排': {
+            ingredients: ['牛排(肋眼或菲力)', '鹽', '黑胡椒', '奶油', '蒜', '迷迭香'],
+            steps: ['1. 牛排回溫灑鹽胡椒', '2. 平底鍋大火煎至表面焦香', '3. 加奶油蒜和迷迭香', '4. 靜置5分鐘切片'],
+            tips: '厚切牛排是王道,煎到三分或五分熟最嫩,記得靜置!'
+        },
+        '美國麥當勞': {
+            ingredients: ['漢堡肉', '起司', '生菜', '番茄', '洋蔥', '酸黃瓜', '特製醬', '漢堡包'],
+            steps: ['1. 漢堡肉煎熟', '2. 麵包烤香', '3. 依序疊上配料', '4. 淋醬料組合完成'],
+            tips: '速食界霸主,特製醬是靈魂,配薯條和可樂是經典組合!'
+        },
+        '泰式冬陰功': {
+            ingredients: ['蝦', '香茅', '南薑', '檸檬葉', '辣椒', '魚露', '檸檬汁', '草菇'],
+            steps: ['1. 香茅南薑煮出香味', '2. 加蝦和草菇', '3. 調入魚露辣椒', '4. 最後擠檸檬汁'],
+            tips: '泰國國湯,酸辣平衡是關鍵,檸檬汁要最後加!'
+        },
+        '泰式打拋豬': {
+            ingredients: ['豬絞肉', '打拋葉', '辣椒', '蒜', '魚露', '蠔油', '糖', '九層塔', '荷包蛋'],
+            steps: ['1. 蒜辣椒爆香', '2. 炒豬絞肉至乾香', '3. 加調味料和打拋葉', '4. 配飯和荷包蛋'],
+            tips: '火要大炒出香氣,打拋葉(聖羅勒)是靈魂,沒有可用九層塔!'
+        },
+        '越南煎餅': {
+            ingredients: ['米漿', '薑黃', '豬肉', '蝦', '豆芽', '生菜', '香草', '魚露'],
+            steps: ['1. 米漿加薑黃調色', '2. 倒入熱鍋煎脆', '3. 放肉蝦豆芽煎熟', '4. 包生菜香草沾魚露吃'],
+            tips: '餅皮要薄脆,用豬油煎更香,包生菜吃清爽解膩!'
+        },
+        '韓式冷麵': {
+            ingredients: ['蕎麥麵', '牛肉湯', '醋', '糖', '黃瓜', '水煮蛋', '梨', '芥末'],
+            steps: ['1. 牛肉湯冰透', '2. 加醋糖調味', '3. 麵煮熟過冰水', '4. 放入湯中加配料'],
+            tips: '夏日消暑聖品,湯要夠冰,加冰塊更好,芥末提味!'
+        },
+        '義大利披薩': {
+            ingredients: ['麵團', '番茄醬', '莫札瑞拉起司', '羅勒', '橄欖油'],
+            steps: ['1. 麵團發酵後桿薄', '2. 抹番茄醬', '3. 鋪起司和配料', '4. 高溫烤至起司融化邊緣焦香'],
+            tips: '傳統用窯烤,麵皮要薄,起司要足,羅勒最後放!'
+        },
+        '韓式拌飯': {
+            ingredients: ['白飯', '牛肉', '菠菜', '豆芽', '紅蘿蔔', '香菇', '雞蛋', '辣椒醬', '麻油'],
+            steps: ['1. 各種蔬菜分別炒熟', '2. 牛肉炒香', '3. 飯上擺好各種配料', '4. 放荷包蛋加辣椒醬拌勻'],
+            tips: '配料要豐富,石鍋拌飯鍋底會有鍋巴更香!'
+        },
+        '韓式炸雞': {
+            ingredients: ['雞肉', '麵粉', '太白粉', '韓式辣醬', '蒜', '糖', '醬油', '芝麻'],
+            steps: ['1. 雞肉裹粉炸酥', '2. 蒜糖醬油調醬', '3. 炸雞裹醬拌勻', '4. 灑芝麻即可'],
+            tips: '炸兩次更酥脆,辣醬要甜辣平衡,配啤酒是絕配!'
+        }
+    };
+    
+    // 為每個卡片添加翻轉結構和按讚功能
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.card').forEach((card, index) => {
+            const itemId = `foreign-${index + 1}`;
+            card.setAttribute('data-item-id', itemId);
+            
+            const img = card.querySelector('img');
+            const body = card.querySelector('.card-body');
+            const title = body.querySelector('.card-title').textContent;
+            const meta = body.querySelector('.card-meta').textContent;
+            const likeData = likes[itemId] || { count: 0, liked: false };
+            
+            const recipe = foreignRecipes[title] || {
+                ingredients: ['主要食材與配料', '當地特色調味料', '新鮮蔬菜與香料'],
+                steps: ['1. 準備並處理所有食材', '2. 依照當地傳統烹調技法', '3. 調配特色醬料與香料', '4. 精心擺盤並搭配配菜'],
+                tips: '使用道地食材與調味料,掌握火候與時間,就能做出正宗的異國美味!'
+            };
+            
+            card.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-front">
+                        ${img.outerHTML}
+                        <div class="card-body">
+                            <div class="card-title">${title}</div>
+                            <div class="card-meta">${meta}</div>
+                            <div class="like-section">
+                                <button class="like-btn ${likeData.liked ? 'liked' : ''}" aria-label="按讚">
+                                    <span class="heart-icon">${likeData.liked ? '❤️' : '🤍'}</span>
+                                </button>
+                                <span class="like-count">${likeData.count}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-back">
+                        <div class="recipe-title">${title} 食譜</div>
+                        <div class="recipe-section">
+                            <h4>📝 食材：</h4>
+                            <p>國家：${meta}</p>
+                            <ul>
+                                ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="recipe-section">
+                            <h4>👨‍🍳 做法：</h4>
+                            <ul>
+                                ${recipe.steps.map(step => `<li>${step}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="recipe-section">
+                            <h4>💡 小技巧：</h4>
+                            <p>${recipe.tips}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 翻轉功能
+            card.addEventListener('click', function(e) {
+                if (e.target.closest('.like-btn')) {
+                    return;
+                }
+                if(!this.classList.contains('highlighting')) {
+                    this.classList.toggle('flipped');
+                }
+            });
+            
+            // 按讚功能
+            const likeBtn = card.querySelector('.like-btn');
+            const likeCount = card.querySelector('.like-count');
+            const heartIcon = card.querySelector('.heart-icon');
+            
+            likeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const currentData = likes[itemId] || { count: 0, liked: false };
+                
+                if (currentData.liked) {
+                    currentData.count = Math.max(0, currentData.count - 1);
+                    currentData.liked = false;
+                    heartIcon.textContent = '🤍';
+                    likeBtn.classList.remove('liked');
+                } else {
+                    currentData.count++;
+                    currentData.liked = true;
+                    heartIcon.textContent = '❤️';
+                    likeBtn.classList.add('liked');
+                }
+                
+                likes[itemId] = currentData;
+                likeCount.textContent = currentData.count;
+                localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(likes));
+            });
+        });
+        
+        // 搜尋與篩選功能
+        const cards = Array.from(document.querySelectorAll('.card'));
+        const qInput = document.getElementById('q');
+        const filterCountry = document.getElementById('filterCountry');
+        
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const q = qInput.value.trim().toLowerCase();
+            const country = filterCountry.value;
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const matchQ = q ? text.includes(q) : true;
+                const matchC = country ? text.includes(country.toLowerCase()) : true;
+
+                if(matchQ && matchC){
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+                card.classList.remove('flipped');
+            });
+        });
+        
+        // 隨機抽選功能
+        document.getElementById('randBtn').addEventListener('click', () => {
+            const visible = cards.filter(c => c.style.display !== 'none');
+            if (visible.length === 0) {
+                alert('目前沒有符合的項目');
+                return;
+            }
+            const pick = visible[Math.floor(Math.random() * visible.length)];
+            pick.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            pick.classList.add('highlighting');
+            pick.style.transition = 'transform 0.3s';
+            pick.style.transform = 'scale(1.05)';
+            
+            setTimeout(() => {
+                pick.classList.add('flipped');
+                pick.style.transform = '';
+                setTimeout(() => {
+                    pick.classList.remove('highlighting');
+                }, 500);
+            }, 800);
+        });
+    });
+</script>
+
+</body>
+</html>

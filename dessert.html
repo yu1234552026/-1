@@ -1,0 +1,534 @@
+
+
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>甜點探索區</title>
+
+<style>
+    /* 核心變更為 school.html 的樣式基礎 */
+    /* 基本重置 */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "Helvetica Neue", Arial; background:#fff7fb; color:#333} /* 保留 index.html 的背景色 */
+
+    /* 頁首 - 更改為粉色系 */
+    header{background:#FFC0CB;padding:18px 24px;border-bottom:3px } /* 淺粉色背景 */
+    .top-row{display:flex;align-items:center;gap:18px}
+    .logo{font-weight:700;color:#c74385;font-size:30px;font-family:"漢儀新蒂蘇孝慈碑"} /* 深粉色文字 */
+
+    /* 圓形分類按鈕 */
+    .categories{display:flex;gap:14px;align-items:center}
+    .cat,.cat1,.cat2,.cat3,.cat4,.cat5,.cat6,.cat7{
+        width:64px;height:64px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        border:3px solid #c74385;
+        color:#c74385;
+        font-weight:700;
+        text-decoration:none;
+        transition:0.25s;
+        cursor:pointer;
+    }
+
+    .cat.active{
+        background:#c74385;
+        color:#fff;
+        border:3px solid #c74385;
+    }
+
+    /* 彩色 hover 效果 - 為每個分類添加不同顏色 */
+    .cat1:hover{transform:scale(1.1);background:#8B6F47;color:#fff;border:3px solid #8B6F47}
+    .cat2:hover{transform:scale(1.1);background:#F095A7;color:#fff;border:3px solid #F095A7}
+    .cat3:hover{transform:scale(1.1);background:#73E5FC;color:#fff;border:3px solid #73E5FC}
+    .cat:hover,.cat4:hover{transform:scale(1.1);background:#F7EE8F;color:#fff;border:3px solid #F7EE8F}
+    .cat5:hover{transform:scale(1.1);background:#6940AB;color:#fff;border:3px solid #6940AB}
+    .cat6:hover{transform:scale(1.1);background:#FC988F;color:#fff;border:3px solid #FC988F}
+    .cat7:hover{transform:scale(1.1);background:#B4D4BA;color:#fff;border:3px solid #B4D4BA}
+
+    .cat.active:hover{
+        transform:scale(1.1);
+        background:#c74385;
+        color:#fff;
+        border:3px solid #c74385;
+    }
+
+    /* 篩選列 */
+    .filters{display:flex;flex-wrap: wrap;gap:12px;align-items:center;margin:18px 0;justify-content: center;}
+    .filters select,.filters input{padding:8px 10px;border-radius:8px;border:1px solid #FFC0CB}
+    .filters button{padding:8px 12px;border-radius:8px;border:none;background:#c74385;color:#fff; cursor: pointer;} /* 深粉色按鈕 */
+    .filters button:hover{background:#a9346e;}
+    .filters select:focus, .filters input:focus{outline: none;border:1px solid #a9346e;}
+
+    /* 主要內容區 - 上部示意區 */
+    .hero{
+          padding:25px;
+          text-align:center;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+	  background:#FFF0FE;	
+        }
+
+    .hero h1{color:#c74385;margin-bottom:20px;font-size:47px;} /* 深粉色標題 */
+    .hero p{color:#666; font-size: 16px;}
+
+    /* 下方滑動區：固定高度，垂直滾動；每行兩個卡片 */
+    .scroll-area{
+      height:calc(100vh - 220px); /* 可依需求調整 */
+      overflow-y:auto;
+      padding:18px 24px 36px;
+      background:linear-gradient(#fff, #fff);
+    }
+
+    /* 使用 grid 兩欄排列，列間縱向延續 */
+    .card-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px}
+
+    /* 卡片 */
+    .card{
+      background:transparent;
+      border-radius:12px;
+      height:420px;
+      position:relative;
+      cursor:pointer;
+      perspective:1000px;
+      transition:transform 0.3s ease;
+    }
+    
+    .card:hover{
+      transform:translateY(-8px);
+    }
+    
+    .card-inner{
+      position:relative;
+      width:100%;
+      height:100%;
+      transition:transform 0.6s;
+      transform-style:preserve-3d;
+    }
+    
+    .card.flipped .card-inner{
+      transform:rotateY(180deg);
+    }
+    
+    .card-front, .card-back{
+      position:absolute;
+      width:100%;
+      height:100%;
+      backface-visibility:hidden;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 6px 18px rgba(11,20,30,0.06);
+      border:1px solid #FFC0CB;
+    }
+    
+    .card-front{
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+    }
+    
+    .card-back{
+      background:linear-gradient(135deg, #fff 0%, #fff0fe 100%);
+      transform:rotateY(180deg);
+      padding:20px;
+      overflow-y:auto;
+    }
+    
+    .card img{width:100%;height:300px;object-fit:cover;display:block}
+    .card-body{padding:12px;text-align:center;position:relative;}
+    .card-title{font-weight:700;margin-bottom:6px;color:#c74385;}
+    .card-meta{color:#8a8a8a;font-size:13px}
+    
+    /* 按讚按鈕樣式 */
+    .like-section{margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .like-btn{background:none;border:none;cursor:pointer;font-size:24px;padding:4px 8px;transition:transform 0.2s;display:flex;align-items:center;gap:4px;text-decoration:none;outline:none}
+    .like-btn:hover{transform:scale(1.15)}
+    .like-btn:active{transform:scale(0.95)}
+    .like-btn.liked{animation:likeAnimation 0.3s ease}
+    .like-count{font-size:14px;color:#666;font-weight:600;min-width:30px;text-align:left}
+    @keyframes likeAnimation{
+      0%, 100%{transform:scale(1)}
+      50%{transform:scale(1.3)}
+    }
+    
+    .recipe-title{font-size:18px;font-weight:700;color:#c74385;margin-bottom:15px;text-align:center}
+    .recipe-section{margin-bottom:15px}
+    .recipe-section h4{font-size:14px;font-weight:700;color:#a9346e;margin-bottom:8px}
+    .recipe-section p, .recipe-section ul{font-size:13px;color:#555;line-height:1.6}
+    .recipe-section ul{padding-left:20px}
+    .recipe-section li{margin-bottom:4px}
+        box-shadow: 0 8px 20px rgba(199,67,133,0.2); /* 粉色陰影 */
+    }
+
+    /* 小螢幕下調整為一欄 */
+    @media (max-width:640px){
+      .card-grid{grid-template-columns:1fr}
+      .categories{overflow:auto}
+      .scroll-area{height:calc(100vh - 280px);}
+      .hero h1{font-size:36px;}
+    }
+
+    /* 美化滾動條（桌面瀏覽器支援） */
+    .scroll-area::-webkit-scrollbar{width:10px}
+    .scroll-area::-webkit-scrollbar-track{background:#f0f0f0;border-radius:10px}
+    .scroll-area::-webkit-scrollbar-thumb{background:#FFC0CB;border-radius:10px} /* 淺粉色滾動條 */
+    
+    .footer{
+        text-align:center;
+        padding:12px;
+        margin-top:20px;
+        background:#FFC0CB;
+        color:#4a4a4a;
+        font-size:14px;
+        border-top:2px solid #c74385;
+    }
+
+</style>
+</head>
+
+<body>
+    <header>
+        <div class="top-row">
+            <div class="logo">今天吃什麼？</div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>🍰甜點探索區🍰</h1>
+
+            <div>
+                <nav class="categories" aria-label="分類">
+                    <a href="index.html" class="cat1">首頁</a>
+                    <a href="main.html" class="cat2">主食</a>
+                    <a href="drink.html" class="cat3">飲品</a>
+                    <a href="dessert.html" class="cat active">甜點</a>
+                    <a href="weird.html" class="cat5">怪奇</a>
+                    <a href="foreign.html" class="cat6">異國</a>
+                    <a href="school.html" class="cat7">公館</a> </nav>
+            </div>
+
+            <div class="filters">
+                <select id="filterTaste">
+                    <option value="">依口味篩選</option>
+                    <option value="甜">甜</option>
+                    <option value="酸">酸</option>
+                    <option value="巧克力">巧克力</option>
+                    <option value="草莓">草莓</option>
+                    <option value="抹茶">抹茶</option>
+                </select>
+
+                <select id="filterType">
+                    <option value="">依類型篩選</option>
+                    <option value="蛋糕">蛋糕</option>
+                    <option value="餅乾">餅乾</option>
+                    <option value="冰品">冰品</option>
+                    <option value="點心">點心</option>
+                </select>
+
+                <input type="text" id="searchInput" placeholder="搜尋甜點名稱～">
+                <button onclick="searchDessert()">搜尋</button>
+                <button onclick="randomDessert()">隨機抽選</button>
+            </div>
+            <p>使用上方篩選或搜尋，或按下隨機抽選尋找今日甜點吧！</p>
+        </section>
+
+        <section class="scroll-area" id="scrollArea">
+            <div class="card-grid" id="dessertContainer">
+                </div>
+        </section>
+
+        <footer class="footer">
+            <p>SEE YOU SOON ｜ Y-Five ｜ foodie@gmail.com</p>
+        </footer>
+
+    </main>
+
+<script>
+    /* 甜點資料 */
+    const desserts = [
+        {name:"巴斯克蛋糕", taste:"甜", type:"蛋糕",img:"照片/甜點/巴斯克蛋糕.jpg"},
+        {name:"奶油泡芙", taste:"甜", type:"點心",img:"照片/甜點/奶油泡芙.webp"},
+        {name:"巧克力布朗尼", taste:"巧克力", type:"蛋糕",img:"照片/甜點/巧克力布朗尼.jpg"},
+        {name:"巧克力熔岩蛋糕", taste:"巧克力", type:"蛋糕",img:"照片/甜點/巧克力熔岩蛋糕.jpg"},
+        {name:"芋泥蛋糕卷", taste:"甜",type:"蛋糕",img:"照片/甜點/芋泥蛋糕卷.jpg"},
+        {name:"芒果奶酪", taste:"甜", type:"點心",img:"照片/甜點/芒果奶酪.jpg"},
+        {name:"抹茶生巧克力", taste:"抹茶", type:"點心",img:"照片/甜點/抹茶生巧克力.jpg"},
+        {name:"芝士蛋糕", taste:"甜", type:"蛋糕",img:"照片/甜點/芝士蛋糕.jpg"},
+        {name:"紅豆銅鑼燒", taste:"甜", type:"點心",img:"照片/甜點/紅豆銅鑼燒.jpg"},
+        {name:"香草冰淇淋", taste:"甜", type:"冰品",img:"照片/甜點/香草冰淇淋.jpg"},
+        {name:"香蕉煎餅", taste:"甜", type:"點心",img:"照片/甜點/香蕉煎餅.jpg"},
+        {name:"草莓大福", taste:"甜", taste:"草莓",type:"點心",img:"照片/甜點/草莓大福.jpeg"},
+        {name:"草莓蛋糕卷", taste:"甜",taste:"草莓", type:"蛋糕",img:"照片/甜點/草莓蛋糕卷.jpg"},
+        {name:"提拉米蘇", taste:"甜", type:"蛋糕",img:"照片/甜點/提拉米蘇.jpg"},
+        {name:"焦糖布丁", taste:"甜", type:"點心",img:"照片/甜點/焦糖布丁.jpg"},
+        {name:"糖水豆花", taste:"甜", type:"點心",img:"照片/甜點/糖水豆花.jpeg"},
+        {name:"糖葫蘆", taste:"甜", type:"點心",img:"照片/甜點/糖葫蘆.jpg"},
+        {name:"檸檬塔", taste:"酸", type:"蛋糕",img:"照片/甜點/檸檬塔.jpg"},
+        {name:"草莓優格杯",taste:"酸",type:"點心",img:"照片/甜點/草莓優格杯.jpg"},
+        {name:"檸檬千層",taste:"酸",type:"蛋糕",img:"照片/甜點/檸檬千層.jpg"}
+    ];
+    
+    // 甜點食譜資料庫
+    const dessertRecipes = {
+        '巴斯克蛋糕': {
+            ingredients: ['奶油起司500g', '細砂糖150g', '雞蛋4顆', '鮮奶油200ml', '低筋麵粉15g'],
+            steps: ['1. 奶油起司室溫軟化加糖打勻', '2. 分次加入雞蛋攪拌', '3. 加鮮奶油和麵粉拌勻', '4. 倒入模具200°C烤40分鐘'],
+            tips: '表面要烤到焦黑才對!中心要保持濕潤,冷藏後更好吃!'
+        },
+        '奶油泡芙': {
+            ingredients: ['水100ml', '奶油50g', '低筋麵粉60g', '雞蛋2顆', '鮮奶油200ml', '糖粉'],
+            steps: ['1. 水和奶油煮滾加麵粉拌成團', '2. 放涼後加蛋攪拌成麵糊', '3. 擠花袋擠出烤至膨脹', '4. 冷卻後填入鮮奶油'],
+            tips: '麵糊要夠濃稠才會膨,烤時不能開烤箱門!'
+        },
+        '巧克力布朗尼': {
+            ingredients: ['黑巧克力200g', '奶油150g', '糖120g', '雞蛋3顆', '低筋麵粉80g', '可可粉30g'],
+            steps: ['1. 巧克力奶油隔水融化', '2. 加糖和蛋攪拌均勻', '3. 篩入麵粉可可粉拌勻', '4. 倒模烤180°C約25分鐘'],
+            tips: '不要烤太熟,中心微濕潤口感最好,加核桃更香!'
+        },
+        '巧克力熔岩蛋糕': {
+            ingredients: ['黑巧克力150g', '奶油100g', '雞蛋2顆', '蛋黃2個', '糖60g', '麵粉30g'],
+            steps: ['1. 巧克力奶油隔水融化', '2. 蛋和糖打發', '3. 混合後篩入麵粉', '4. 倒杯烤200°C約12分鐘'],
+            tips: '烤8-12分鐘,中心要流動!趁熱吃最美味!'
+        },
+        '芋泥蛋糕卷': {
+            ingredients: ['雞蛋4顆', '糖80g', '低筋麵粉80g', '芋頭400g', '鮮奶油200ml', '奶油50g'],
+            steps: ['1. 蛋白蛋黃分開打發', '2. 混合拌入麵粉烤蛋糕體', '3. 芋頭蒸熟加奶油打成泥', '4. 蛋糕抹芋泥捲起冷藏'],
+            tips: '芋泥要細膩,蛋糕體不能太乾,捲時動作要快!'
+        },
+        '芒果奶酪': {
+            ingredients: ['芒果2顆', '鮮奶油200ml', '牛奶200ml', '糖50g', '吉利丁10g'],
+            steps: ['1. 吉利丁泡軟', '2. 牛奶加糖煮溫加吉利丁', '3. 加入鮮奶油攪勻', '4. 倒杯冷藏加芒果丁'],
+            tips: '要夠冰才好吃,芒果要選熟透的,可加椰奶更南洋風!'
+        },
+        '抹茶生巧克力': {
+            ingredients: ['白巧克力200g', '鮮奶油100ml', '抹茶粉15g', '抹茶粉(撒粉用)'],
+            steps: ['1. 鮮奶油加熱不沸騰', '2. 倒入白巧克力攪拌融化', '3. 加抹茶粉拌勻', '4. 倒盤冷藏切塊撒抹茶粉'],
+            tips: '要用好抹茶粉,冷藏至少3小時,切時刀要熱!'
+        },
+        '芝士蛋糕': {
+            ingredients: ['奶油起司250g', '糖70g', '雞蛋2顆', '鮮奶油100ml', '餅乾底100g'],
+            steps: ['1. 餅乾壓碎加奶油做底', '2. 起司加糖打軟', '3. 加蛋和鮮奶油拌勻', '4. 倒入模具隔水烤160°C約1小時'],
+            tips: '隔水烤才不會裂,冷藏一晚最好吃!'
+        },
+        '紅豆銅鑼燒': {
+            ingredients: ['雞蛋2顆', '糖60g', '蜂蜜20g', '低筋麵粉100g', '紅豆餡200g'],
+            steps: ['1. 蛋糖蜂蜜打發', '2. 篩入麵粉拌勻靜置', '3. 平底鍋煎成圓餅', '4. 夾入紅豆餡'],
+            tips: '麵糊要靜置30分,火不要太大,兩片大小要一樣!'
+        },
+        '香草冰淇淋': {
+            ingredients: ['鮮奶油400ml', '牛奶200ml', '糖100g', '蛋黃4個', '香草莢1根'],
+            steps: ['1. 牛奶香草莢加熱', '2. 蛋黃加糖打發', '3. 混合煮至濃稠', '4. 冷卻後加鮮奶油冷凍攪拌'],
+            tips: '每小時攪拌一次避免冰晶,用冰淇淋機更滑順!'
+        },
+        '香蕉煎餅': {
+            ingredients: ['香蕉2根', '雞蛋2顆', '低筋麵粉150g', '牛奶200ml', '糖30g', '奶油'],
+            steps: ['1. 香蕉壓成泥', '2. 加蛋奶糖麵粉拌勻', '3. 平底鍋煎至兩面金黃', '4. 淋蜂蜜或糖漿'],
+            tips: '香蕉要熟透,麵糊不要太稠,小火慢煎!'
+        },
+        '草莓大福': {
+            ingredients: ['糯米粉100g', '糖30g', '水120ml', '草莓8顆', '紅豆餡200g', '太白粉'],
+            steps: ['1. 糯米粉糖水混合微波', '2. 取出搓揉成團', '3. 紅豆餡包草莓', '4. 糯米皮包入撒粉'],
+            tips: '糯米團要熱才好包,手要沾太白粉防沾,冷藏後食用!'
+        },
+        '草莓蛋糕卷': {
+            ingredients: ['雞蛋4顆', '糖80g', '低筋麵粉80g', '鮮奶油300ml', '草莓適量'],
+            steps: ['1. 蛋白蛋黃分開打發', '2. 混合拌入麵粉烤蛋糕體', '3. 鮮奶油打發', '4. 抹奶油放草莓捲起'],
+            tips: '草莓切片排列整齊,奶油不要打過發,捲時用烘焙紙輔助!'
+        },
+        '提拉米蘇': {
+            ingredients: ['馬斯卡彭起司250g', '蛋黃3個', '糖60g', '鮮奶油200ml', '手指餅乾', '濃縮咖啡', '可可粉'],
+            steps: ['1. 蛋黃糖打發加起司', '2. 鮮奶油打發拌入', '3. 餅乾沾咖啡鋪底', '4. 鋪起司糊重複撒可可粉'],
+            tips: '要冷藏4小時以上,咖啡要濃,可可粉食用前再撒!'
+        },
+        '焦糖布丁': {
+            ingredients: ['雞蛋3顆', '牛奶400ml', '糖80g(布丁)', '糖100g(焦糖)', '水50ml', '香草精'],
+            steps: ['1. 糖加水煮成焦糖倒杯', '2. 蛋加糖牛奶攪勻過篩', '3. 倒入杯中', '4. 隔水蒸烤約40分鐘'],
+            tips: '焦糖要煮到深褐色,蛋液要過篩才細滑,冷藏後更好吃!'
+        },
+        '糖水豆花': {
+            ingredients: ['黃豆300g', '水2000ml', '吉利丁15g', '紅糖100g', '薑片'],
+            steps: ['1. 黃豆泡水打成豆漿', '2. 煮沸過濾', '3. 加吉利丁攪拌', '4. 倒盤凝固配糖水'],
+            tips: '豆漿要濃,可用石膏做更傳統,糖水加薑片更養生!'
+        },
+        '糖葫蘆': {
+            ingredients: ['山楂或水果', '冰糖200g', '水100ml', '竹籤'],
+            steps: ['1. 水果洗淨串竹籤', '2. 冰糖加水煮至大泡', '3. 水果裹糖漿', '4. 放涼凝固即可'],
+            tips: '糖要煮到150°C才會脆,動作要快,可用草莓葡萄橘子!'
+        },
+        '檸檬塔': {
+            ingredients: ['塔皮麵團', '檸檬4顆', '雞蛋3顆', '糖150g', '奶油100g', '玉米粉15g'],
+            steps: ['1. 塔皮烤至金黃', '2. 檸檬汁皮蛋糖煮濃稠', '3. 加奶油拌勻', '4. 倒入塔皮冷藏'],
+            tips: '檸檬餡要夠酸,冷藏後更好吃,可擠鮮奶油裝飾!'
+        },
+        '草莓優格杯': {
+            ingredients: ['草莓200g', '原味優格400g', '蜂蜜30ml', '燕麥片50g', '薄荷葉'],
+            steps: ['1. 草莓切片', '2. 優格加蜂蜜拌勻', '3. 杯中依序鋪優格草莓燕麥', '4. 重複分層裝飾薄荷'],
+            tips: '要現做現吃,可加堅果增加口感,用希臘優格更濃郁!'
+        },
+        '檸檬千層': {
+            ingredients: ['低筋麵粉150g', '雞蛋3顆', '牛奶500ml', '糖80g', '奶油50g', '檸檬2顆', '鮮奶油300ml'],
+            steps: ['1. 做可麗餅皮約20張', '2. 檸檬汁皮加糖煮成醬', '3. 鮮奶油打發', '4. 餅皮夾檸檬奶油疊層'],
+            tips: '餅皮要薄,每層抹均勻,冷藏4小時定型更好切!'
+        }
+    };
+    
+    const dessertList = desserts;
+    const container = document.getElementById("dessertContainer");
+    const LIKE_STORAGE_KEY = 'dessertLikes';
+    let likes = JSON.parse(localStorage.getItem(LIKE_STORAGE_KEY) || '{}');
+
+    /* 渲染卡片 */
+    function renderDesserts(list) {
+        container.innerHTML = "";
+        list.forEach((d, index) => {
+            const itemId = `dessert-${index + 1}`;
+            const likeData = likes[itemId] || { count: 0, liked: false };
+            
+            const recipe = dessertRecipes[d.name] || {
+                ingredients: ['主要食材依產品而定', '糖、奶油、雞蛋等基本材料', '特殊調味料或裝飾'],
+                steps: ['1. 準備所有食材並預熱烤箱', '2. 混合乾性材料與濕性材料', '3. 倒入模具中進行烘烤', '4. 冷卻後裝飾即可享用'],
+                tips: '烘焙時注意溫度控制,確保食材新鮮,裝飾前完全冷卻效果更佳!'
+            };
+            
+            const card = document.createElement("article");
+            card.className = "card";
+            card.setAttribute('data-item-id', itemId);
+            card.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="${d.img}" alt="${d.name}">
+                        <div class="card-body">
+                            <div class="card-title">${d.name}</div>
+                            <div class="card-meta">${d.taste} | ${d.type}</div>
+                            <div class="like-section">
+                                <button class="like-btn" aria-label="按讚">
+                                    <span class="heart-icon">${likeData.liked ? '❤️' : '🤍'}</span>
+                                </button>
+                                <span class="like-count">${likeData.count}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-back">
+                        <div class="recipe-title">${d.name} 食譜</div>
+                        <div class="recipe-section">
+                            <h4>📝 食材：</h4>
+                            <p>${d.taste} | ${d.type}</p>
+                            <ul>
+                                ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="recipe-section">
+                            <h4>👨‍🍳 做法：</h4>
+                            <ul>
+                                ${recipe.steps.map(step => `<li>${step}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="recipe-section">
+                            <h4>💡 小技巧：</h4>
+                            <p>${recipe.tips}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 翻轉功能
+            card.addEventListener('click', function(e) {
+                if (e.target.closest('.like-btn')) {
+                    return;
+                }
+                if(!this.classList.contains('highlighting')) {
+                    this.classList.toggle('flipped');
+                }
+            });
+            
+            // 按讚功能
+            const likeBtn = card.querySelector('.like-btn');
+            const likeCount = card.querySelector('.like-count');
+            const heartIcon = card.querySelector('.heart-icon');
+            
+            likeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const currentData = likes[itemId] || { count: 0, liked: false };
+                
+                if (currentData.liked) {
+                    currentData.count = Math.max(0, currentData.count - 1);
+                    currentData.liked = false;
+                    heartIcon.textContent = '🤍';
+                    likeBtn.classList.remove('liked');
+                } else {
+                    currentData.count++;
+                    currentData.liked = true;
+                    heartIcon.textContent = '❤️';
+                    likeBtn.classList.add('liked');
+                }
+                
+                likes[itemId] = currentData;
+                likeCount.textContent = currentData.count;
+                localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(likes));
+            });
+            
+            if (likeData.liked) {
+                likeBtn.classList.add('liked');
+            }
+            
+            container.appendChild(card);
+        });
+    }
+
+    renderDesserts(dessertList);
+    
+    /* 篩選 */
+    document.getElementById("filterTaste").addEventListener("change", filterDesserts);
+    document.getElementById("filterType").addEventListener("change", filterDesserts);
+
+    function filterDesserts() {
+        const taste = document.getElementById("filterTaste").value;
+        const type = document.getElementById("filterType").value;
+
+        const filtered = dessertList.filter(d =>
+            (taste === "" || d.taste === taste) &&
+            (type === "" || d.type === type)
+        );
+
+        renderDesserts(filtered);
+    }
+
+    /* 搜尋 */
+    function searchDessert() {
+        const keyword = document.getElementById("searchInput").value.trim();
+        const filtered = dessertList.filter(d => d.name.includes(keyword));
+        renderDesserts(filtered);
+    }
+
+    /* 隨機抽選 - 加上高亮效果和翻轉 */
+    function randomDessert() {
+        const visibleCards = Array.from(document.querySelectorAll('.card'));
+        const filtered = visibleCards.filter(c => c.style.display !== 'none');
+        
+        if(filtered.length === 0){alert('目前沒有符合的項目'); return}
+        
+        const pick = filtered[Math.floor(Math.random()*filtered.length)];
+        // 將容器滾到該卡片位置
+        pick.scrollIntoView({behavior:'smooth',block:'center'});
+        
+        // 加個短暫高亮並自動翻轉顯示資訊
+        pick.classList.add('highlighting');
+        pick.style.transition = 'transform 0.3s';
+        pick.style.transform = 'scale(1.05)';
+        
+        setTimeout(() => {
+            pick.classList.add('flipped');
+            pick.style.transform = '';
+            setTimeout(() => {
+                pick.classList.remove('highlighting');
+            }, 500);
+        }, 800);
+    }
+</script>
+
+</body>
+</html>

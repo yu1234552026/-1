@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首頁</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 導航欄 -->
+    <header class="header">
+        <div class="header-title">今天吃什麼?</div>
+        <nav class="nav-circles">
+            <a href="index.html" class="nav-circle nav-home active">首頁</a>
+            <a href="main.html" class="nav-circle nav-main">主食</a>
+            <a href="drink.html" class="nav-circle nav-drink">飲品</a>
+            <a href="dessert.html" class="nav-circle nav-dessert">甜點</a>
+            <a href="weird.html" class="nav-circle nav-weird">怪奇</a>
+            <a href="foreign.html" class="nav-circle nav-foreign">異國</a>
+            <a href="school.html" class="nav-circle nav-school">公館</a>
+        </nav>
+    </header>
+
+    <!-- 篩選區塊 -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="filter-group">
+                <select class="filter-select">
+                    <option>依頻型篩選</option>
+                    <option>最新</option>
+                    <option>最熱門</option>
+                </select>
+                <select class="filter-select">
+                    <option>依地區篩選</option>
+                    <option>亞洲</option>
+                    <option>歐洲</option>
+                    <option>南洋</option>
+                </select>
+                <input type="text" class="filter-input" placeholder="搜尋怪奇名稱">
+                <button class="filter-btn btn-search">搜尋</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 橫幅輪播 - 跑馬燈形式 -->
+<!-- 橫幅輪播 -->
+    <section class="banner">
+        <div class="carousel-container">
+            <!-- 左箭頭 -->
+            <button class="carousel-arrow arrow-left" id="prevBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+
+            <!-- 輪播軌道 -->
+            <div class="carousel-viewport">
+                <div class="carousel-track" id="carouselTrack">
+                    
+                    <div class="carousel-slide">
+                        <img src="https://img.ltn.com.tw/Upload/health/page/800/2023/01/01/phpMdvuvb.jpg" alt="Banner 2">
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://www.ss-plaza.com.tw/wp-content/uploads/2024/07/%E5%90%9B%E6%A8%82%E9%A3%AF%E5%BA%973F-%E7%BE%8E%E9%A3%9F%E8%A1%97-%E9%99%B3%E8%A8%98%E6%9C%A8%E6%A1%B6%E7%87%92-IMG.jpg" alt="Banner 3">
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://v3-statics.mirrormedia.mg/images/b05fd709-ce04-4b07-aa0e-12640f0edb2e-w1600.webP" alt="Banner 4">
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://www.vietnamairlines.com/~/media/SEO-images/2025%20SEO/Traffic%20TA/MN/food%20hong%20kong/its-typically-enjoyed-as-part-of-a-tea-time-tradition.jpg" alt="Banner 5">
+                    </div>
+		   <div class="carousel-slide">
+                        <img src="https://tse2.mm.bing.net/th/id/OIP.C5YYZDZnjmtIP7MBlmWvAAHaEa?pid=Api&P=0&h=180/its-typically-enjoyed-as-part-of-a-tea-time-tradition.jpg" alt="Banner 1">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右箭頭 -->
+            <button class="carousel-arrow arrow-right" id="nextBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 指示點 -->
+        <div class="carousel-dots" id="carouselDots"></div>
+    </section>
+
+
+
+    <!-- 商品網格 -->
+    <section class="products">
+        <div class="container">
+            <div class="products-wrapper">
+                <!-- 商品網格 -->
+                <!-- 今日主打區塊 -->
+                <div class="products-grid-section">
+                    <h2 class="section-title">今日主打</h2>
+                    <div class="products-grid featured-grid">
+                        <!-- 卡片1 -->
+                        <a href="main.html" class="product-card featured-card">
+                            <img src="https://asianinspirations.com.au/wp-content/uploads/2022/10/Taiwan-Island-of-Heavenly-Flavours_00-Feat.jpg"主食">
+                            <div class="featured-overlay">
+                                <span class="featured-title">主食</span>
+                            </div>
+                        </a>
+
+                        <!-- 卡片2 -->
+                        <a href="drink.html" class="product-card featured-card">
+                            <img src="https://image.damanwoo.com/files/media/c/a/m/a/c/o/f/f/e/e/cama_coffee_roastersqi_jian_dian_du_jia_fan_shou_3kuan_yin_pin_jiang_jing_pin_ka_pei_yu_shui_guo_feng_wei_jie_he_._.jpg"飲品">
+                            <div class="featured-overlay">
+                                <span class="featured-title">飲品</span>
+                            </div>
+                        </a>
+
+                        <!-- 卡片3 -->
+                        <a href="dessert.html" class="product-card featured-card">
+                            <img src="https://www.gomaji.com/blog/wp-content/uploads/2021/02/123214186_202087168143302_6884857750127799528_n.jpg" alt="甜點">
+                            <div class="featured-overlay">
+                                <span class="featured-title">甜點</span>
+                            </div>
+                        </a>
+
+                        <!-- 卡片4 -->
+                        <a href="weird.html" class="product-card featured-card">
+                            <img src="https://hips.hearstapps.com/hmg-prod/images/%E5%85%A5%E5%8F%A3%E5%8D%B3%E5%9C%B0%E7%8D%84-%E5%99%81%E3%81%AE%E9%A3%9F%E7%89%A9%E5%8D%9A%E7%89%A9%E9%A4%A8-%E7%BE%8A%E7%9C%BC%E6%B1%81-685f8bc1e957c.jpg?crop=1xw:1xh;center,top&resize=980:*" alt="怪奇">
+                            <div class="featured-overlay">
+                                <span class="featured-title">怪奇</span>
+                            </div>
+                        </a>
+
+                        <!-- 卡片5 -->
+                        <a href="foreign.html" class="product-card featured-card">
+                            <img src="https://gcp-obs.line-scdn.net/0hkwD86GljNFh5QSPh7LtLD0AXOClKMzJQADlyO1tDOm8EeG8PECZ6IlkSYj9IIXVZRzt5OAkRaGpSc3ZdECE/w1200" alt="異國">
+                            <div class="featured-overlay">
+                                <span class="featured-title">異國</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 排行榜區塊 -->
+                <div class="products-grid-section">
+                    <h2 class="section-title">排行榜</h2>
+                    <div class="products-grid ranking-grid-single">
+                        <!-- 排行榜卡片1 -->
+                        <div class="product-card">
+                            <div class="product-image">
+                                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M 50 20 Q 70 35 70 55 Q 70 75 50 80 Q 30 75 30 55 Q 30 35 50 20" fill="none" stroke="currentColor" stroke-width="3"/>
+                                    <circle cx="50" cy="55" r="8" fill="currentColor"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- 頁腳 -->
+    <footer class="footer">
+        <p>SEE YOU SOON | Y.Five 出品 | foodie@gmail.com</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

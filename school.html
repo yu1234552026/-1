@@ -1,0 +1,563 @@
+
+
+
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>公館探索區</title>
+  <style>
+    /* 基本重置 */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "Helvetica Neue", Arial; background:#f7f9fb; color:#333}
+
+    /* 頁首 */
+    header{background:#B4D4BA;padding:18px 24px;border-bottom:3px}
+    .top-row{display:flex;align-items:center;gap:18px}
+    .logo{font-weight:700;color:#40754A;font-size:30px;font-family:"漢儀新蒂蘇孝慈碑"}
+
+    /* 圓形分類按鈕 */
+    .categories{display:flex;gap:14px;align-items:center}
+    .cat,.cat1,.cat2,.cat3,.cat4,.cat5,.cat6{
+        width:64px;height:64px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        border:3px solid #40754A;
+        color:#40754A;
+        font-weight:700;
+        text-decoration:none;
+        transition:0.25s;
+        cursor:pointer;
+    }
+
+    .cat.active{
+        background:#40754A;
+        color:#fff;
+        border:3px solid #40754A;
+    }
+
+    /* 彩色 hover 效果 - 為每個分類添加不同顏色 */
+    .cat1:hover{transform:scale(1.1);background:#8B6F47;color:#fff;border:3px solid #8B6F47}
+    .cat2:hover{transform:scale(1.1);background:#F095A7;color:#fff;border:3px solid #F095A7}
+    .cat3:hover{transform:scale(1.1);background:#73E5FC;color:#fff;border:3px solid #73E5FC}
+    .cat4:hover{transform:scale(1.1);background:#F7EE8F;color:#fff;border:3px solid #F7EE8F}
+    .cat5:hover{transform:scale(1.1);background:#6940AB;color:#fff;border:3px solid #6940AB}
+    .cat6:hover{transform:scale(1.1);background:#FC988F;color:#fff;border:3px solid #FC988F}
+    .cat:hover{transform:scale(1.1);background:#B4D4BA;color:#fff;border:3px solid #B4D4BA}
+
+    .cat.active:hover{
+        transform:scale(1.1);
+        background:#40754A;
+        color:#fff;
+        border:3px solid #40754A;
+    }
+
+    /* 篩選列 */
+    .filters{display:flex;flex-wrap: wrap;gap:12px;align-items:center;margin:18px 0;justify-content: center;}
+    .filters select,.filters input{padding:8px 10px;border-radius:8px;border:1px solid #B4D4BA}
+    .filters button{padding:8px 12px;border-radius:8px;border:none;background:#40754A;color:#fff; cursor: pointer;}
+	.filters button:hover{background:#40604A;}
+    	.filters select:focus, .filters input:focus{outline: none;border:1px solid #40604A;}
+
+
+    /* 主要內容區 - 上部示意區 */
+    .hero{
+          padding:25px;
+          text-align:center;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+	  background:#F0FFF1;
+        }
+
+    .hero h1{color:#40754A;margin-bottom:20px;font-size:47px;}
+    .hero p{color:#666; font-size: 16px;}
+
+    /* 下方滑動區：固定高度，垂直滾動；每行兩個卡片 */
+    .scroll-area{
+      height:calc(100vh - 220px); /* 可依需求調整 */
+      overflow-y:auto;
+      padding:18px 24px 36px;
+      background:linear-gradient(#fff, #fff);
+    }
+
+    /* 使用 grid 兩欄排列，列間縱向延續，『上下滑動』就是容器垂直滾動 */
+    .card-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px}
+
+    .card{
+      background:#fff;
+      border-radius:12px;
+      box-shadow:0 6px 18px rgba(11,20,30,0.06);
+      overflow:hidden;
+      border:1px solid #B4D4BA;
+      display:flex;
+      flex-direction:column;
+      cursor:pointer;
+      transition:all 0.3s ease;
+    }
+    
+    .card:hover{
+      transform:translateY(-8px);
+      box-shadow: 0 8px 20px rgba(64,117,74,0.2);
+    }
+    
+    .card img{width:100%;height:300px;object-fit:cover;display:block}
+    .card-body{padding:12px;text-align:center;position:relative;}
+    .card-title{font-weight:700;margin-bottom:6px;color:#40754A;}
+    .card-meta{color:#8a8a8a;font-size:13px}
+    
+    /* 按讚按鈕樣式 */
+    .like-section{margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .like-btn{background:none;border:none;cursor:pointer;font-size:24px;padding:4px 8px;transition:transform 0.2s;display:flex;align-items:center;gap:4px;text-decoration:none;outline:none}
+    .like-btn:hover{transform:scale(1.15)}
+    .like-btn:active{transform:scale(0.95)}
+    .like-btn.liked{animation:likeAnimation 0.3s ease}
+    .like-count{font-size:14px;color:#666;font-weight:600;min-width:30px;text-align:left}
+    @keyframes likeAnimation{
+      0%, 100%{transform:scale(1)}
+      50%{transform:scale(1.3)}
+    }
+
+    /* 小螢幕下調整為一欄 */
+    @media (max-width:640px){
+      .card-grid{grid-template-columns:1fr}
+      .categories{overflow:auto}
+    }
+
+    /* 美化滾動條（桌面瀏覽器支援） */
+    .scroll-area::-webkit-scrollbar{width:10px}
+    .scroll-area::-webkit-scrollbar-track{background:#f0f0f0;border-radius:10px}
+    .scroll-area::-webkit-scrollbar-thumb{background:#B4D4BA;border-radius:10px}
+    
+    .footer{
+        text-align:center;
+        padding:12px;
+        margin-top:20px;
+        background:#B4D4BA;
+        color:#4a4a4a;
+        font-size:14px;
+        border-top:2px solid #40754A;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top-row">
+        <div class="logo">今天吃什麼？</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+        <h1>♔☞公館探索區☜♔</h1>
+
+        <div>
+            <nav class="categories" aria-label="分類">
+                <div class="cat1" onclick="location.href='index.html'">首頁</div>
+                <div class="cat2" onclick="location.href='main.html'">主食</div>
+                <div class="cat3" onclick="location.href='drink.html'">飲品</div>
+                <div class="cat4" onclick="location.href='dessert.html'">甜點</div>
+                <div class="cat5" onclick="location.href='weird.html'">怪奇</div>
+                <div class="cat6" onclick="location.href='foreign.html'">異國</div>
+                <div class="cat active">公館</div>
+            </nav>
+        </div>
+
+        <div class="filters">
+        
+
+            <select id="type">
+                <option value="">依類型篩選</option>
+                <option>第一學生餐廳</option>
+                <option>第三學生餐廳</option>
+                <option>後餐</option>
+                <option>公館</option>
+
+            </select>
+
+            <input id="q" placeholder="搜尋品名( ～'ω')～" />
+            <button id="searchBtn">搜尋</button>
+            <button id="randBtn">隨機抽選</button>
+        </div>
+        <p>使用上方篩選或搜尋，或按下隨機抽選尋找今日美食吧！(๑´ڡ`๑)</p>
+    </section>
+
+    <section class="scroll-area" id="scrollArea">
+      <div class="card-grid" id="cardGrid">
+        <!-- 範例卡片：可用程式動態填入或直接寫更多 HTML 卡片 -->
+
+	<a href= "https://www.sushiro.com.tw/Shop/ShopInfo?shopId=148">
+	<article class="card">
+            <img src="照片/公館/GG1.jpg" alt="GG1">
+            <div class="card-body">
+                <div class="card-title">壽司郎</div>
+                <div class="card-meta">公館</div>
+            </div>
+        </article>
+	</a>	
+
+        <article class="card">
+            <img src="照片/公館/one1.jpg" alt="one1">
+            <div class="card-body">
+                <div class="card-title">福客亭早餐</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="照片/公館/one2.jpg" alt="one2">
+            <div class="card-body">
+                <div class="card-title">A華加湯滷味</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/TR1.jpg" alt="TR1">
+            <div class="card-body">
+                <div class="card-title">活力讚早餐</div>
+                <div class="card-meta">第三學生餐廳 </div>
+            </div>
+        </article>
+        
+
+	<a href="https://shop.ichefpos.com/store/GSVrc-1V/ordering">
+	<article class="card">
+            <img src="照片/公館/GG6.webp" alt="webp">
+            <div class="card-body">
+                <div class="card-title">小螺波螺螄粉</div>
+                <div class="card-meta">公館</div>
+            </div>
+        </article>
+	</a>
+
+
+	<article class="card">
+            <img src="照片/公館/GG3.jpg" alt="GG3">
+            <div class="card-body">
+                <div class="card-title">麻辣巴蕾</div>
+                <div class="card-meta">公館</div>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="照片/公館/one3.jpg" alt="one3">
+            <div class="card-body">
+                <div class="card-title">溫州大餛飩</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/one4.jpg" alt="one4">
+            <div class="card-body">
+                <div class="card-title">七樂燒臘</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/one14.jpg" alt="one14">
+            <div class="card-body">
+                <div class="card-title">歐趴雞肉</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="照片/公館/one6.jpg" alt="one6">
+            <div class="card-body">
+                <div class="card-title">御弁當日式料理</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+
+        
+        <article class="card">
+            <img src="照片/公館/TR2.jpg" alt="TR2">
+            <div class="card-body">
+                <div class="card-title">越香</div>
+                <div class="card-meta">第三學生餐廳</div>
+            </div>
+        </article>
+                
+        <article class="card">
+            <img src="照片/公館/one10.jpg" alt="one10">
+            <div class="card-body">
+                <div class="card-title">小熊廚房</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/one11.jpg" alt="one11">
+            <div class="card-body">
+                <div class="card-title">小木屋鬆餅</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/one12.jpg" alt="one12">
+            <div class="card-body">
+                <div class="card-title">清心福全</div>
+                <div class="card-meta"> 第一學生餐廳</div>
+            </div>
+        </article>
+                
+        <article class="card">
+            <img src="照片/公館/TR6.jpg" alt="TR6">
+            <div class="card-body">
+                <div class="card-title">八方雲集</div>
+                <div class="card-meta">第三學生餐廳</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/TR7.jpg" alt="TR7">
+            <div class="card-body">
+                <div class="card-title">帝一味自助餐</div>
+                <div class="card-meta">第三學生餐廳</div>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="照片/公館/one13.jpg" alt="one13">
+            <div class="card-body">
+                <div class="card-title">摩斯漢堡</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="照片/公館/TR2.jpg" alt="TR2">
+            <div class="card-body">
+                <div class="card-title">越香</div>
+                <div class="card-meta">第三學生餐廳</div>
+            </div>
+        </article>
+
+	<article class="card">
+            <img src="照片/公館/GG5.jpeg" alt="GG5">
+            <div class="card-body">
+                <div class="card-title">武及蛋包飯</div>
+                <div class="card-meta">公館</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/TR3.jpg" alt="TR3">
+            <div class="card-body">
+                <div class="card-title">豪享來麵店</div>
+                <div class="card-meta">第三學生餐廳</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/TR4.jpg" alt="TR4">
+            <div class="card-body">
+                <div class="card-title">稻穗</div>
+                <div class="card-meta">第三學生餐廳</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/TR5.jpg" alt="TR5">
+            <div class="card-body">
+                <div class="card-title">雞同鴨講</div>
+                <div class="card-meta">第三學生餐廳</div>
+            </div>
+        </article>
+
+        
+        <article class="card">
+            <img src="照片/公館/TR8.jpg" alt="TR8">
+            <div class="card-body">
+                <div class="card-title">京都日式料理</div>
+                <div class="card-meta">第三學生餐廳</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/one9.jpg" alt="one9">
+            <div class="card-body">
+                <div class="card-title">涼麵自由吧</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/one5.jpg" alt="one5">
+            <div class="card-body">
+                <div class="card-title">李媽媽麵店</div>
+                <div class="card-meta"> 第一學生餐廳 </div>
+            </div>
+        </article>
+        
+        
+        <article class="card">
+            <img src="照片/公館/BA1.jpg" alt="BA1">
+            <div class="card-body">
+                <div class="card-title">炒飯</div>
+                <div class="card-meta">後餐</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/公館/BA2.jpg" alt="BA2">
+            <div class="card-body">
+                <div class="card-title">炸物三兄弟</div>
+                <div class="card-meta">後餐</div>
+            </div>
+        </article>
+	
+	<a href= "https://www.sushiro.com.tw/Shop/ShopInfo?shopId=148">
+	<article class="card">
+            <img src="照片/公館/GG1.jpg" alt="GG1">
+            <div class="card-body">
+                <div class="card-title">壽司郎</div>
+                <div class="card-meta">公館</div>
+            </div>
+        </article>
+	</a>	
+
+	<article class="card">
+            <img src="照片/公館/GG2.jpg" alt="GG2">
+            <div class="card-body">
+                <div class="card-title">十二巷拉麵</div>
+                <div class="card-meta">公館</div>
+            </div>
+        </article>
+
+	<article class="card">
+            <img src="照片/公館/GG4.jpg" alt="GG4">
+            <div class="card-body">
+                <div class="card-title">塊雞師食務所</div>
+                <div class="card-meta">公館</div>
+            </div>
+        </article>
+
+
+
+	<article class="card">
+            <img src="照片/公館/GG7.jpg" alt="GG7">
+            <div class="card-body">
+                <div class="card-title">鍋in</div>
+                <div class="card-meta">公館</div>
+            </div>
+        </article>
+
+        <!-- 若需要更多卡片，只要複製上面 article 元素 -->
+
+      </div>
+    </section>
+    <footer class="footer">
+        <p>SEE YOU SOON ｜ Y-Five ｜ foodie@gmail.com</p>
+    </footer>
+
+  </main>
+
+<script>
+    const LIKE_STORAGE_KEY = 'schoolLikes';
+    
+    // 初始化所有卡片的按讚功能
+    document.addEventListener('DOMContentLoaded', function() {
+        let likes = JSON.parse(localStorage.getItem(LIKE_STORAGE_KEY) || '{}');
+        const cards = document.querySelectorAll('.card');
+        
+        cards.forEach((card, index) => {
+            const itemId = `school-${index + 1}`;
+            card.setAttribute('data-item-id', itemId);
+            
+            // 如果卡片沒有按讚按鈕，則添加
+            const cardBody = card.querySelector('.card-body');
+            if (cardBody && !cardBody.querySelector('.like-section')) {
+                const likeData = likes[itemId] || { count: 0, liked: false };
+                const likeSection = document.createElement('div');
+                likeSection.className = 'like-section';
+                likeSection.innerHTML = `
+                    <button class="like-btn ${likeData.liked ? 'liked' : ''}" aria-label="按讚">
+                        <span class="heart-icon">${likeData.liked ? '❤️' : '🤍'}</span>
+                    </button>
+                    <span class="like-count">${likeData.count}</span>
+                `;
+                cardBody.appendChild(likeSection);
+                
+                // 按讚功能
+                const likeBtn = likeSection.querySelector('.like-btn');
+                const likeCount = likeSection.querySelector('.like-count');
+                const heartIcon = likeSection.querySelector('.heart-icon');
+                
+                likeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    const currentData = likes[itemId] || { count: 0, liked: false };
+                    
+                    if (currentData.liked) {
+                        currentData.count = Math.max(0, currentData.count - 1);
+                        currentData.liked = false;
+                        heartIcon.textContent = '🤍';
+                        likeBtn.classList.remove('liked');
+                    } else {
+                        currentData.count++;
+                        currentData.liked = true;
+                        heartIcon.textContent = '❤️';
+                        likeBtn.classList.add('liked');
+                    }
+                    
+                    likes[itemId] = currentData;
+                    likeCount.textContent = currentData.count;
+                    localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(likes));
+                });
+            }
+        });
+    });
+    
+    // 簡單的搜尋與隨機抽選示範
+    const cards = Array.from(document.querySelectorAll('.card'));
+    const grid = document.getElementById('cardGrid');
+    const qInput = document.getElementById('q');
+    const typeSelect = document.getElementById('type');
+
+    function filterCards() {
+      const q = qInput.value.trim().toLowerCase();
+      const t = typeSelect.value;
+
+      cards.forEach(card => {
+        const title = card.querySelector('.card-title').innerText.toLowerCase();
+        const meta = card.querySelector('.card-meta').innerText.trim();
+        
+        const matchQ = q ? title.includes(q) : true;
+        const matchT = t ? meta.includes(t) : true;
+        
+        card.style.display = (matchQ && matchT) ? '' : 'none';
+      });
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', filterCards);
+    
+    typeSelect.addEventListener('change', filterCards);
+    
+    qInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') filterCards();
+    });
+
+    document.getElementById('randBtn').addEventListener('click', () => {
+      const visible = cards.filter(c => c.style.display !== 'none');
+      if (visible.length === 0) { alert('目前沒有符合的項目'); return; }
+      const pick = visible[Math.floor(Math.random() * visible.length)];
+      pick.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      pick.style.transition = 'transform 0.3s, box-shadow 0.3s';
+      pick.style.transform = 'scale(1.05)';
+      pick.style.boxShadow = '0 8px 30px rgba(64,117,74,0.4)';
+      
+      setTimeout(() => {
+          pick.style.transform = '';
+          pick.style.boxShadow = '';
+      }, 1500);
+    });
+  </script></body>
+</html>

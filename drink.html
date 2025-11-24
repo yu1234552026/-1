@@ -1,0 +1,772 @@
+
+
+
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>飲品探索區</title>
+  <style>
+    /* 基本重置 */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "Helvetica Neue", Arial; background:#f7f9fb; color:#333}
+
+    /* 頁首 */
+    header{background:#BCF6FC;padding:18px 24px;border-bottom:3px}
+    .top-row{display:flex;align-items:center;gap:18px}
+    .logo{font-weight:700;color:#73E5FC;font-size:30px;font-family:"漢儀新蒂蘇孝慈碑"}
+
+    /* 圓形分類按鈕 */
+    /* 圓形分類按鈕 */
+    .categories{display:flex;gap:14px;align-items:center}
+    .cat{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid #73E5FC;color:#73E5FC;font-weight:700;text-decoration:none;transition:0.25s;cursor:pointer}
+    .cat.active{background:#73E5FC;color:#fff;border-color:#73E5FC}
+    
+    /* 彩色 hover 效果 - 為每個分類添加不同顏色 */
+    .cat:nth-child(1):hover{transform:scale(1.1);background:#8B6F47;color:#fff;border:3px solid #8B6F47}
+    .cat:nth-child(2):hover{transform:scale(1.1);background:#F095A7;color:#fff;border:3px solid #F095A7}
+    .cat:nth-child(3):hover{transform:scale(1.1);background:#73E5FC;color:#fff;border:3px solid #73E5FC}
+    .cat:nth-child(4):hover{transform:scale(1.1);background:#F7EE8F;color:#fff;border:3px solid #F7EE8F}
+    .cat:nth-child(5):hover{transform:scale(1.1);background:#6940AB;color:#fff;border:3px solid #6940AB}
+    .cat:nth-child(6):hover{transform:scale(1.1);background:#FC988F;color:#fff;border:3px solid #FC988F}
+    .cat:nth-child(7):hover{transform:scale(1.1);background:#B4D4BA;color:#fff;border:3px solid #B4D4BA}
+    
+    .cat.active:hover{transform:scale(1.1);background:#73E5FC;color:#fff;border:3px solid #73E5FC}
+
+    /* 篩選列 */
+    .filters{display:flex;flex-wrap: wrap;gap:12px;align-items:center;margin:18px 0;justify-content: center;}
+    .filters select,.filters input{padding:8px 10px;border-radius:8px;border:1px solid #BCF6FC}
+    .filters button{padding:8px 12px;border-radius:8px;border:none;background:#73E5FC;color:#fff;cursor:pointer;transition:0.2s}
+    .filters button:hover{background:#4DD0E1;transform:scale(1.05)}
+    	.filters select:focus, .filters input:focus{outline: none;border:1px solid #4DD0E1;}
+
+
+    /* 主要內容區 - 上部示意區 */
+    .hero{
+          padding:25px;
+          text-align:center;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+	  background:#EEFCFF;
+        }
+
+    .hero h1{color:#73E5FC;margin-bottom:20px;font-size:47px}
+    .hero p{color:#666; font-size: 16px;}
+
+    /* 下方滑動區：固定高度，垂直滾動；每行兩個卡片 */
+    .scroll-area{
+      height:calc(100vh - 220px); /* 可依需求調整 */
+      overflow-y:auto;
+      padding:18px 24px 36px;
+      background:linear-gradient(#fff, #fff);
+    }
+
+    /* 使用 grid 兩欄排列，列間縱向延續，『上下滑動』就是容器垂直滾動 */
+    .card-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px}
+
+    .card{
+      background:transparent;
+      border-radius:12px;
+      height:420px;
+      position:relative;
+      cursor:pointer;
+      perspective:1000px;
+      transition:transform 0.3s ease;
+    }
+    
+    .card:hover{
+      transform:translateY(-8px);
+    }
+    
+    .card-inner{
+      position:relative;
+      width:100%;
+      height:100%;
+      transition:transform 0.6s;
+      transform-style:preserve-3d;
+    }
+    
+    .card.flipped .card-inner{
+      transform:rotateY(180deg);
+    }
+    
+    .card-front, .card-back{
+      position:absolute;
+      width:100%;
+      height:100%;
+      backface-visibility:hidden;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 6px 18px rgba(11,20,30,0.06);
+      border:1px solid #BCF6FC;
+    }
+    
+    .card-front{
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+    }
+    
+    .card-back{
+      background:linear-gradient(135deg, #fff 0%, #f0fcff 100%);
+      transform:rotateY(180deg);
+      padding:20px;
+      overflow-y:auto;
+    }
+    
+    .card img{width:100%;height:300px;object-fit:cover;display:block}
+    .card-body{padding:12px; text-align: center; position: relative;}
+    .card-title{font-weight:700;margin-bottom:6px; color: #73E5FC;}
+    .card-meta{color:#8a8a8a;font-size:13px}
+    
+    /* 按讚按鈕樣式 */
+    .like-section{margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .like-btn{background:none;border:none;cursor:pointer;font-size:24px;padding:4px 8px;transition:transform 0.2s;display:flex;align-items:center;gap:4px;text-decoration:none;outline:none}
+    .like-btn:hover{transform:scale(1.15)}
+    .like-btn:active{transform:scale(0.95)}
+    .like-btn.liked{animation:likeAnimation 0.3s ease}
+    .like-count{font-size:14px;color:#666;font-weight:600;min-width:30px;text-align:left}
+    
+    @keyframes likeAnimation{
+      0%, 100%{transform:scale(1)}
+      50%{transform:scale(1.3)}
+    }
+    
+    .recipe-title{font-size:18px;font-weight:700;color:#73E5FC;margin-bottom:15px;text-align:center}
+    .recipe-section{margin-bottom:15px}
+    .recipe-section h4{font-size:14px;font-weight:700;color:#4DD0E1;margin-bottom:8px}
+    .recipe-section p, .recipe-section ul{font-size:13px;color:#555;line-height:1.6}
+    .recipe-section ul{padding-left:20px}
+    .recipe-section li{margin-bottom:4px}
+
+    /* 小螢幕下調整為一欄 */
+    @media (max-width:640px){
+      .card-grid{grid-template-columns:1fr}
+      .categories{overflow:auto}
+    }
+
+    /* 美化滾動條（桌面瀏覽器支援） */
+    .scroll-area::-webkit-scrollbar{width:10px}
+    .scroll-area::-webkit-scrollbar-track{background:#f0f0f0;border-radius:10px}
+    .scroll-area::-webkit-scrollbar-thumb{background:#BCF6FC;border-radius:10px}
+    
+    .footer{
+        text-align:center;
+        padding:12px;
+        margin-top:20px;
+        background:#BCF6FC;
+        color:#4a4a4a;
+        font-size:14px;
+        border-top:2px solid #73E5FC;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top-row">
+        <div class="logo">今天吃什麼？</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+        <h1>飲品探索區</h1>
+
+        <div>
+            <nav class="categories" aria-label="分類">
+                <div class="cat" onclick="location.href='index.html'">首頁</div>
+                <div class="cat" onclick="location.href='main.html'">主食</div>
+                <div class="cat active">飲品</div>
+                <div class="cat" onclick="location.href='dessert.html'">甜點</div>
+                <div class="cat" onclick="location.href='weird.html'">怪奇</div>
+                <div class="cat" onclick="location.href='foreign.html'">異國</div>
+                <div class="cat" onclick="location.href='school.html'">公館</div>
+            </nav>
+        </div>
+
+        <div class="filters">
+            <select id="country">
+                <option value="">依國家篩選</option>
+                <option>台灣</option>
+                <option>日本</option>
+                <option>韓國</option>
+                <option>美國</option>
+                <option>義大利</option>
+                <option>泰國</option>
+                <option>越南</option>
+                <option>印度</option>
+                <option>英國</option>
+                <option>其他</option>
+            </select>
+
+            <select id="type">
+                <option value="">依種類篩選</option>
+                <option>奶茶</option>
+                <option>咖啡</option>
+                <option>茶飲</option>
+                <option>果汁</option>
+                <option>乳製飲品</option>
+                <option>氣泡飲</option>
+                <option>特色飲品</option>
+            </select>
+
+            <input id="q" placeholder="搜尋飲品名稱" />
+            <button id="searchBtn">搜尋</button>
+            <button id="randBtn">隨機抽選</button>
+        </div>
+        <p>使用上方篩選或搜尋，或按下隨機抽選尋找今日飲品吧！</p>
+    </section>
+
+    <section class="scroll-area" id="scrollArea">
+      <div class="card-grid" id="cardGrid">
+        <!-- 茶飲系列 -->
+        <article class="card" data-drink-id="drink-1">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="照片/飲料/珍珠奶茶.webp" alt="珍珠奶茶">
+                    <div class="card-body">
+                        <div class="card-title">珍珠奶茶</div>
+                        <div class="card-meta">奶茶 | 台灣</div>
+                        <div class="like-section">
+                            <button class="like-btn" aria-label="按讚">
+                                <span class="heart-icon">🤍</span>
+                            </button>
+                            <span class="like-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="recipe-title">珍珠奶茶</div>
+                    <div class="recipe-section">
+                        <h4>材料：</h4>
+                        <ul>
+                            <li>黑糖珍珠 100g</li>
+                            <li>紅茶茶葉 10g</li>
+                            <li>鮮奶 200ml</li>
+                            <li>冰塊適量</li>
+                        </ul>
+                    </div>
+                    <div class="recipe-section">
+                        <h4>作法：</h4>
+                        <p>1. 煮珍珠：水滾後放入珍珠,煮15分鐘後關火悶10分鐘<br>
+                        2. 泡茶：熱水泡紅茶5分鐘後放涼<br>
+                        3. 組合：杯中放入珍珠、冰塊，倒入紅茶和鮮奶攪拌均勻</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- 咖啡系列 -->
+        <article class="card" data-drink-id="drink-2">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="照片/飲料/濃黑咖啡.jpg" alt="濃黑咖啡">
+                    <div class="card-body">
+                        <div class="card-title">濃黑咖啡</div>
+                        <div class="card-meta">咖啡 | 義大利</div>
+                        <div class="like-section">
+                            <button class="like-btn" aria-label="按讚">
+                                <span class="heart-icon">🤍</span>
+                            </button>
+                            <span class="like-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="recipe-title">濃黑咖啡</div>
+                    <div class="recipe-section">
+                        <h4>材料：</h4>
+                        <ul>
+                            <li>義式咖啡豆 18g</li>
+                            <li>熱水 50ml</li>
+                        </ul>
+                    </div>
+                    <div class="recipe-section">
+                        <h4>作法：</h4>
+                        <p>1. 研磨咖啡豆至細粉狀<br>
+                        2. 使用義式咖啡機萃取25-30秒<br>
+                        3. 立即享用，感受濃郁香氣</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- 果汁系列 -->
+        <article class="card" data-drink-id="drink-3">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="照片/飲料/新鮮橙汁.png" alt="新鮮橙汁">
+                    <div class="card-body">
+                        <div class="card-title">新鮮橙汁</div>
+                        <div class="card-meta">果汁 | 西班牙</div>
+                        <div class="like-section">
+                            <button class="like-btn" aria-label="按讚">
+                                <span class="heart-icon">🤍</span>
+                            </button>
+                            <span class="like-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="recipe-title">新鮮橙汁</div>
+                    <div class="recipe-section">
+                        <h4>材料：</h4>
+                        <ul>
+                            <li>新鮮柳橙 3-4顆</li>
+                            <li>蜂蜜 1大匙（可選）</li>
+                        </ul>
+                    </div>
+                    <div class="recipe-section">
+                        <h4>作法：</h4>
+                        <p>1. 將柳橙對半切開<br>
+                        2. 使用榨汁機榨汁<br>
+                        3. 過濾果渣，加入蜂蜜調味即可</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- 奶茶系列 -->
+        <article class="card" data-drink-id="drink-4">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="照片/飲料/港式奶茶.jpg" alt="港式奶茶">
+                    <div class="card-body">
+                        <div class="card-title">港式奶茶</div>
+                        <div class="card-meta">奶茶 | 香港</div>
+                        <div class="like-section">
+                            <button class="like-btn" aria-label="按讚">
+                                <span class="heart-icon">🤍</span>
+                            </button>
+                            <span class="like-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="recipe-title">港式奶茶</div>
+                    <div class="recipe-section">
+                        <h4>材料：</h4>
+                        <ul>
+                            <li>錫蘭紅茶 15g</li>
+                            <li>淡奶 100ml</li>
+                            <li>煉乳 30ml</li>
+                            <li>熱水 300ml</li>
+                        </ul>
+                    </div>
+                    <div class="recipe-section">
+                        <h4>作法：</h4>
+                        <p>1. 熱水沖泡紅茶，撞茶3-4次增加濃度<br>
+                        2. 加入淡奶和煉乳攪拌均勻<br>
+                        3. 可加冰塊製成凍奶茶</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- 乳製飲品 -->
+        <article class="card" data-drink-id="drink-5">
+            <img src="照片/飲料/草莓牛奶.webp" alt="草莓牛奶">
+            <div class="card-body">
+                <div class="card-title">草莓牛奶</div>
+                <div class="card-meta">乳製飲品 | 韓國</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 氣泡飲 -->
+        <article class="card" data-drink-id="drink-6">
+            <img src="照片/飲料/氣泡檸檬水.jpeg" alt="氣泡檸檬水">
+            <div class="card-body">
+                <div class="card-title">氣泡檸檬水</div>
+                <div class="card-meta">氣泡飲 | 義大利</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 特色飲品 -->
+        <article class="card" data-drink-id="drink-7">
+            <img src="照片/飲料/冰抹茶拿鐵.jpg" alt="冰抹茶拿鐵">
+            <div class="card-body">
+                <div class="card-title">冰抹茶拿鐵</div>
+                <div class="card-meta">特色飲品 | 日本</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 清爽飲品 -->
+        <article class="card" data-drink-id="drink-8">
+            <img src="照片/飲料/冷泡茶.jpg" alt="冷泡茶">
+            <div class="card-body">
+                <div class="card-title">冷泡茶</div>
+                <div class="card-meta">茶飲 | 台灣</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 咖啡系列 -->
+        <article class="card" data-drink-id="drink-9">
+            <img src="照片/飲料/卡布奇諾.webp" alt="卡布奇諾">
+            <div class="card-body">
+                <div class="card-title">卡布奇諾</div>
+                <div class="card-meta">咖啡 | 義大利</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 果汁系列 -->
+        <article class="card" data-drink-id="drink-10">
+            <img src="照片/飲料/新鮮石榴汁.png" alt="石榴汁">
+            <div class="card-body">
+                <div class="card-title">新鮮石榴汁</div>
+                <div class="card-meta">果汁 | 波斯</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 特色奶茶 -->
+        <article class="card" data-drink-id="drink-11">
+            <img src="照片/飲料/芋頭奶茶.jpg" alt="芋頭奶茶">
+            <div class="card-body">
+                <div class="card-title">芋頭奶茶</div>
+                <div class="card-meta">奶茶 | 台灣</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 咖啡系列 -->
+        <article class="card" data-drink-id="drink-12">
+            <img src="照片/飲料/咖啡拿鐵.avif" alt="拿鐵咖啡">
+            <div class="card-body">
+                <div class="card-title">咖啡拿鐵</div>
+                <div class="card-meta">咖啡 | 義大利</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 乳製飲品 -->
+        <article class="card" data-drink-id="drink-13">
+            <img src="照片/飲料/希臘優格飲.jpg" alt="酸奶">
+            <div class="card-body">
+                <div class="card-title">希臘優格飲</div>
+                <div class="card-meta">乳製飲品 | 希臘</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 特色飲品 -->
+        <article class="card" data-drink-id="drink-14">
+            <img src="照片/飲料/越南冰咖啡.jpg" alt="越南冰咖啡">
+            <div class="card-body">
+                <div class="card-title">越南冰咖啡</div>
+                <div class="card-meta">特色飲品 | 越南</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 氣泡飲 -->
+        <article class="card" data-drink-id="drink-15">
+            <img src="照片/飲料/草莓氣泡飲.jpg" alt="草莓氣泡飲" class="high-quality">
+            <div class="card-body">
+                <div class="card-title">草莓氣泡飲</div>
+                <div class="card-meta">氣泡飲 | 法國</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 茶飲 -->
+        <article class="card" data-drink-id="drink-16">
+            <img src="照片/飲料/蜂蜜檸檬茶.jpeg" alt="蜂蜜檸檬茶">
+            <div class="card-body">
+                <div class="card-title">蜂蜜檸檬茶</div>
+                <div class="card-meta">茶飲 | 台灣</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 果汁 -->
+        <article class="card" data-drink-id="drink-17">
+            <img src="照片/飲料/新鮮芒果汁.webp" alt="芒果汁">
+            <div class="card-body">
+                <div class="card-title">新鮮芒果汁</div>
+                <div class="card-meta">果汁 | 泰國</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 特色飲品 -->
+        <article class="card" data-drink-id="drink-18">
+            <img src="照片/飲料/印度香料奶茶.jpg" alt="印度奶茶">
+            <div class="card-body">
+                <div class="card-title">印度香料奶茶</div>
+                <div class="card-meta">特色飲品 | 印度</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 咖啡 -->
+        <article class="card" data-drink-id="drink-19">
+            <img src="照片/飲料/冷萃咖啡.jpg" alt="冷萃咖啡">
+            <div class="card-body">
+                <div class="card-title">冷萃咖啡</div>
+                <div class="card-meta">咖啡 | 日本</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+        <!-- 乳製飲品 -->
+        <article class="card" data-drink-id="drink-20">
+            <img src="照片/飲料/香蕉牛奶.png" alt="香蕉牛奶">
+            <div class="card-body">
+                <div class="card-title">香蕉牛奶</div>
+                <div class="card-meta">乳製飲品 | 韓國</div>
+                <div class="like-section">
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                </div>
+            </div>
+        </article>
+
+      </div>
+    </section>
+    <footer class="footer">
+        <p>SEE YOU SOON ｜ Y-Five ｜ foodie@gmail.com</p>
+    </footer>
+
+  </main>
+
+  <script>
+    // ========== 按讚功能 ==========
+    // LocalStorage 鍵名
+    const LIKES_KEY = 'drinkLikes';
+    const LIKED_KEY = 'drinkLiked';
+
+    // 初始化按讚數據
+    function initLikes() {
+        const likes = JSON.parse(localStorage.getItem(LIKES_KEY) || '{}');
+        const liked = JSON.parse(localStorage.getItem(LIKED_KEY) || '{}');
+        return { likes, liked };
+    }
+
+    // 儲存按讚數據
+    function saveLikes(likes, liked) {
+        localStorage.setItem(LIKES_KEY, JSON.stringify(likes));
+        localStorage.setItem(LIKED_KEY, JSON.stringify(liked));
+    }
+
+    // 載入並顯示所有按讚狀態
+    function loadLikesState() {
+        const { likes, liked } = initLikes();
+        
+        document.querySelectorAll('.card').forEach(card => {
+            const drinkId = card.dataset.drinkId;
+            if (!drinkId) return;
+            
+            const likeCount = card.querySelector('.like-count');
+            const heartIcon = card.querySelector('.heart-icon');
+            const likeBtn = card.querySelector('.like-btn');
+            
+            // 設定按讚數
+            likeCount.textContent = likes[drinkId] || 0;
+            
+            // 設定按讚狀態
+            if (liked[drinkId]) {
+                heartIcon.textContent = '❤️';
+                likeBtn.classList.add('liked');
+            } else {
+                heartIcon.textContent = '🤍';
+                likeBtn.classList.remove('liked');
+            }
+        });
+    }
+
+    // 處理按讚點擊
+    function handleLike(event, card) {
+        event.stopPropagation(); // 防止觸發卡片翻轉
+        
+        const drinkId = card.dataset.drinkId;
+        if (!drinkId) return;
+        
+        const { likes, liked } = initLikes();
+        const likeBtn = card.querySelector('.like-btn');
+        const heartIcon = card.querySelector('.heart-icon');
+        const likeCount = card.querySelector('.like-count');
+        
+        // 切換按讚狀態
+        if (liked[drinkId]) {
+            // 取消按讚
+            likes[drinkId] = Math.max((likes[drinkId] || 0) - 1, 0);
+            liked[drinkId] = false;
+            heartIcon.textContent = '🤍';
+            likeBtn.classList.remove('liked');
+        } else {
+            // 按讚
+            likes[drinkId] = (likes[drinkId] || 0) + 1;
+            liked[drinkId] = true;
+            heartIcon.textContent = '❤️';
+            likeBtn.classList.add('liked');
+        }
+        
+        // 更新顯示
+        likeCount.textContent = likes[drinkId];
+        
+        // 儲存到 localStorage
+        saveLikes(likes, liked);
+    }
+
+    // 綁定所有按讚按鈕
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function(event) {
+            const card = this.closest('.card');
+            handleLike(event, card);
+        });
+    });
+
+    // 頁面載入時初始化按讚狀態
+    loadLikesState();
+
+    // ========== 卡片翻轉效果 ==========
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // 如果點擊的是按讚按鈕或其子元素，不要翻轉卡片
+            if (e.target.closest('.like-btn')) {
+                return;
+            }
+            
+            // 防止在隨機抽選高亮時誤觸發
+            if(!this.classList.contains('highlighting')) {
+                this.classList.toggle('flipped');
+            }
+        });
+    });
+
+    // ========== 搜尋與篩選功能 ==========
+    const cards = Array.from(document.querySelectorAll('.card'));
+    const grid = document.getElementById('cardGrid');
+    const qInput = document.getElementById('q');
+    const country = document.getElementById('country');
+    const type = document.getElementById('type');
+
+    document.getElementById('searchBtn').addEventListener('click', ()=>{
+      const q = qInput.value.trim().toLowerCase();
+      const c = country.value;
+      const t = type.value;
+
+      // 簡單過濾：根據卡片內文字
+      cards.forEach(card=>{
+        const text = card.innerText.toLowerCase();
+        const matchQ = q? text.includes(q) : true;
+        const matchC = c? text.includes(c.toLowerCase()) : true;
+        const matchT = t? text.includes(t.toLowerCase()) : true;
+        if(matchQ && matchC && matchT) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+        // 重置翻轉狀態
+        card.classList.remove('flipped');
+      })
+    });
+
+    // ========== 隨機抽選功能 ==========
+    document.getElementById('randBtn').addEventListener('click', ()=>{
+        const visible = cards.filter(c=> c.style.display !== 'none');
+        if(visible.length === 0){alert('目前沒有符合的項目'); return}
+        const pick = visible[Math.floor(Math.random()*visible.length)];
+        // 將容器滾到該卡片位置
+        pick.scrollIntoView({behavior:'smooth',block:'center'});
+        // 加個短暫高亮並自動翻轉顯示食譜
+        pick.classList.add('highlighting');
+        pick.style.transition = 'transform 0.3s';
+        pick.style.transform = 'scale(1.05)';
+        
+        setTimeout(() => {
+            pick.classList.add('flipped');
+            pick.style.transform = '';
+            setTimeout(() => {
+                pick.classList.remove('highlighting');
+            }, 500);
+        }, 800);
+    });
+  </script>
+</body>
+</html>

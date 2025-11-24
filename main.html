@@ -1,0 +1,753 @@
+
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>主食</title>
+  <style>
+    /* 基本重置 */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "Helvetica Neue", Arial; background:#f7f9fb; color:#333}
+
+    /* 頁首 */
+    header{background:#FCF4A3;padding:18px 24px;border-bottom:3px}
+    .top-row{display:flex;align-items:center;gap:18px}
+    .logo{font-weight:700;color:#F0C22E;font-size:30px;font-family:"漢儀新蒂蘇孝慈碑"}
+
+    /* 圓形分類按鈕 */
+    .categories{display:flex;gap:14px;align-items:center}
+    /*個別按鈕設定*/
+    .cat{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid #F0C22E;color:#F0C22E;font-weight:700}
+    .cat.active{
+        background:#F0C22E ;
+        color:#fff ;
+    }
+    .cat{
+        text-decoration:none;
+        transition:0.25s;
+        cursor:pointer;
+    }
+    
+    /* 彩色 hover 效果 - 為每個分類添加不同顏色 */
+    .cat:nth-child(1):hover{transform:scale(1.1);background:#8B6F47;color:#fff;border:3px solid #8B6F47}
+    .cat:nth-child(2):hover{transform:scale(1.1);background:#F095A7;color:#fff;border:3px solid #F095A7}
+    .cat:nth-child(3):hover{transform:scale(1.1);background:#73E5FC;color:#fff;border:3px solid #73E5FC}
+    .cat:nth-child(4):hover{transform:scale(1.1);background:#F7EE8F;color:#fff;border:3px solid #F7EE8F}
+    .cat:nth-child(5):hover{transform:scale(1.1);background:#6940AB;color:#fff;border:3px solid #6940AB}
+    .cat:nth-child(6):hover{transform:scale(1.1);background:#FC988F;color:#fff;border:3px solid #FC988F}
+    .cat:nth-child(7):hover{transform:scale(1.1);background:#B4D4BA;color:#fff;border:3px solid #B4D4BA}
+    
+    .cat.active:hover{
+        transform:scale(1.1);
+        background:#F0C22E ;
+        color:#fff;
+        border:3px solid #F0C22E;
+    }
+
+    /* 篩選列 */
+    .filters{display:flex;gap:12px;align-items:center;margin:18px 0}
+    .filters select,.filters input{padding:8px 10px;border-radius:8px;border:1px solid #FFF4A3}
+    .filters button{padding:8px 12px;border-radius:8px;border:none;background:#F0C22E;color:#fff}
+    .filters button:hover{background:#D7A80F;}
+    .filters select:focus, .filters input:focus{outline: none;border:1px solid#D7A80F;}
+
+
+    /* 主要內容區 - 上部示意區 */
+    .hero{
+          padding:25px;
+          text-align:center;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          background: #FFFFF0;
+        }
+
+    .hero h1{color:#F0C22E;margin-bottom:8px;font-size:47px;}
+    .hero p{color:#666}
+
+    /* 下方滑動區：固定高度，垂直滾動；每行兩個卡片 */
+    .scroll-area{
+      height:calc(100vh - 220px); /* 可依需求調整 */
+      overflow-y:auto;
+      padding:18px 24px 36px;
+      background:linear-gradient(#fff, #fff);
+    }
+
+    /* 使用 grid 兩欄排列，列間縱向延續，『上下滑動』就是容器垂直滾動 */
+    .card-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px}
+
+    .card{
+      background:transparent;
+      border-radius:12px;
+      height:420px;
+      position:relative;
+      cursor:pointer;
+      perspective:1000px;
+    }
+    
+    .card-inner{
+      position:relative;
+      width:100%;
+      height:100%;
+      transition:transform 0.6s;
+      transform-style:preserve-3d;
+    }
+    
+    .card.flipped .card-inner{
+      transform:rotateY(180deg);
+    }
+    
+    .card-front, .card-back{
+      position:absolute;
+      width:100%;
+      height:100%;
+      backface-visibility:hidden;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 6px 18px rgba(11,20,30,0.06);
+      border:1px solid #FCEF8C;
+    }
+    
+    .card-front{
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+    }
+    
+    .card-back{
+      background:linear-gradient(135deg, #fff 0%, #fffef0 100%);
+      transform:rotateY(180deg);
+      padding:20px;
+      overflow-y:auto;
+    }
+    
+    .card img{width:100%;height:300px;object-fit:cover;display:block}
+    .card-body{padding:12px;text-align:center;position:relative;}
+    .card-title{font-weight:700;margin-bottom:6px;color:#F0C22E;}
+    .card-meta{color:#8a8a8a;font-size:13px}
+    
+    /* 按讚按鈕樣式 */
+    .like-section{margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .like-btn{background:none;border:none;cursor:pointer;font-size:24px;padding:4px 8px;transition:transform 0.2s;display:flex;align-items:center;gap:4px;text-decoration:none;outline:none}
+    .like-btn:hover{transform:scale(1.15)}
+    .like-btn:active{transform:scale(0.95)}
+    .like-btn.liked{animation:likeAnimation 0.3s ease}
+    .like-count{font-size:14px;color:#666;font-weight:600;min-width:30px;text-align:left}
+    @keyframes likeAnimation{
+      0%, 100%{transform:scale(1)}
+      50%{transform:scale(1.3)}
+    }
+    
+    .recipe-title{font-size:18px;font-weight:700;color:#F0C22E;margin-bottom:15px;text-align:center}
+    .recipe-section{margin-bottom:15px}
+    .recipe-section h4{font-size:14px;font-weight:700;color:#D7A80F;margin-bottom:8px}
+    .recipe-section p, .recipe-section ul{font-size:13px;color:#555;line-height:1.6}
+    .recipe-section ul{padding-left:20px}
+    .recipe-section li{margin-bottom:4px}
+    
+    .card:hover{
+        transform:scale(1.02);
+    }
+
+    /* 小螢幕下調整為一欄 */
+    @media (max-width:640px){
+      .card-grid{grid-template-columns:1fr}
+      .categories{overflow:auto}
+    }
+
+    /* 美化滾動條（桌面瀏覽器支援） */
+    .scroll-area::-webkit-scrollbar{width:10px}
+    .scroll-area::-webkit-scrollbar-track{background:#f0f0f0;border-radius:10px}
+    .scroll-area::-webkit-scrollbar-thumb{background:#FCF4A3;border-radius:10px}
+    
+    .footer{
+        text-align:center;
+        padding:12px;
+        margin-top:20px;
+        background:#FCF4A3; 
+        color:#4a4a4a;
+        font-size:14px;
+        border-top:2px solid #F0C22E;
+    }
+
+  </style>
+</head>
+<body>
+    <header>
+        <div class="top-row">
+        <div class="logo">今天吃什麼？</div>
+    </div>
+    </header>
+
+    <main>
+    <section class="hero">
+        <h1>主食探索區</h1>
+
+        <div>
+            <nav class="categories" aria-label="分類">
+                <a href="index.html" class="cat">首頁</a>
+                <a href="main.html" class="cat active">主食</a>
+                <a href="drink.html" class="cat">飲品</a>
+                <a href="dessert.html" class="cat">甜點</a>
+                <a href="weird.html" class="cat">怪奇</a>
+                <a href="foreign.html" class="cat">異國</a>
+                <a href="school.html" class="cat">公館</a>
+            </nav>
+        </div>
+
+        <div class="filters">
+            <select id="type">
+                <option value="">全部</option>
+                <option>米飯</option>
+                <option>麵食</option>
+                <option>鍋物</option>
+                <option>肉類</option>
+                <option>其他</option>
+            </select>
+
+            <input id="q" placeholder="吃啥呢 ฅ• •ฅ" />
+            
+            <button id="searchBtn">搜尋</button>
+            <button id="randBtn">隨機抽選</button>
+        </div>
+        <p>✦───── 使用上方篩選或搜尋，或按下隨機抽選來決定吃什麼吧 ─────✦</p>
+    </section>
+
+    <section class="scroll-area" id="scrollArea">
+      <div class="card-grid" id="cardGrid">
+        <article class="card" data-item-id="main-1">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="照片/主食/炒飯.jpg" alt="炒飯">
+                    <div class="card-body">
+                        <div class="card-title">炒飯</div>
+                        <div class="card-meta">米飯</div>
+                        <div class="like-section">
+                            <button class="like-btn" aria-label="按讚">
+                                <span class="heart-icon">🤍</span>
+                            </button>
+                            <span class="like-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="recipe-title">炒飯</div>
+                    <div class="recipe-section">
+                        <h4>材料：</h4>
+                        <ul>
+                            <li>隔夜白飯 2碗</li>
+                            <li>雞蛋 2顆</li>
+                            <li>蔥花 適量</li>
+                            <li>醬油 1大匙</li>
+                            <li>鹽、胡椒 適量</li>
+                        </ul>
+                    </div>
+                    <div class="recipe-section">
+                        <h4>作法：</h4>
+                        <p>1. 熱鍋下油，炒散雞蛋後盛起<br>
+                        2. 放入白飯炒散，加入醬油拌炒<br>
+                        3. 加入雞蛋、蔥花，調味後即可</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+        
+        <article class="card" data-item-id="main-2">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="照片/主食/炒麵.jpg" alt="炒麵">
+                    <div class="card-body">
+                        <div class="card-title">炒麵</div>
+                        <div class="card-meta">麵食</div>
+                        <div class="like-section">
+                            <button class="like-btn" aria-label="按讚">
+                                <span class="heart-icon">🤍</span>
+                            </button>
+                            <span class="like-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="recipe-title">炒麵</div>
+                    <div class="recipe-section">
+                        <h4>材料：</h4>
+                        <ul>
+                            <li>黃麵 300g</li>
+                            <li>高麗菜 100g</li>
+                            <li>紅蘿蔔 50g</li>
+                            <li>醬油 2大匙</li>
+                            <li>蠔油 1大匙</li>
+                        </ul>
+                    </div>
+                    <div class="recipe-section">
+                        <h4>作法：</h4>
+                        <p>1. 麵條先燙軟瀝乾<br>
+                        2. 炒香蔬菜後加入麵條<br>
+                        3. 加醬油、蠔油拌炒均勻即可</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="card">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="照片/主食/桌菜.jpg" alt="桌菜">
+                    <div class="card-body">
+                        <div class="card-title">桌菜</div>
+                        <div class="card-meta">其他</div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="recipe-title">桌菜</div>
+                    <div class="recipe-section">
+                        <h4>推薦餐廳：</h4>
+                        <p>桌菜適合多人聚餐，建議選擇信譽良好的餐廳預訂</p>
+                    </div>
+                    <div class="recipe-section">
+                        <h4>經典菜色：</h4>
+                        <ul>
+                            <li>佛跳牆</li>
+                            <li>紅燒獅子頭</li>
+                            <li>清蒸魚</li>
+                            <li>宮保雞丁</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="card">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="照片/主食/泡麵.jpg" alt="泡麵">
+                    <div class="card-body">
+                        <div class="card-title">泡麵</div>
+                        <div class="card-meta">麵食</div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="recipe-title">升級版泡麵</div>
+                    <div class="recipe-section">
+                        <h4>材料：</h4>
+                        <ul>
+                            <li>泡麵 1包</li>
+                            <li>雞蛋 1顆</li>
+                            <li>青菜 適量</li>
+                            <li>起司片 1片（可選）</li>
+                        </ul>
+                    </div>
+                    <div class="recipe-section">
+                        <h4>作法：</h4>
+                        <p>1. 水滾後放入麵條和調味包<br>
+                        2. 加入青菜、雞蛋煮熟<br>
+                        3. 可加起司片增加風味</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="照片/主食/餛飩麵.jpg" alt="餛飩麵">
+            <div class="card-body">
+                <div class="card-title">餛飩麵</div>
+                <div class="card-meta">麵食</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/水餃.jpg" alt="水餃">
+            <div class="card-body">
+                <div class="card-title">水餃</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="照片/主食/酸菜魚.jpg" alt="酸菜魚">
+            <div class="card-body">
+                <div class="card-title">酸菜魚</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="照片/主食/燒烤.jpg" alt="燒烤">
+            <div class="card-body">
+                <div class="card-title">燒烤</div>
+                <div class="card-meta">肉類</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/牛排.jpg" alt="牛排">
+            <div class="card-body">
+                <div class="card-title">牛排</div>
+                <div class="card-meta">肉類</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/咖哩飯.jpg" alt="咖哩飯">
+            <div class="card-body">
+                <div class="card-title">咖哩飯</div>
+                <div class="card-meta">米飯</div>
+            </div>
+        </article>
+                
+        <article class="card">
+            <img src="照片/主食/薑母鴨.jpg" alt="薑母鴨">
+            <div class="card-body">
+                <div class="card-title">薑母鴨</div>
+                <div class="card-meta">鍋物</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/焗烤.jpg" alt="焗烤">
+            <div class="card-body">
+                <div class="card-title">焗烤</div>
+                <div class="card-meta">米飯/麵食</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/牛肉麵.jpg" alt="牛肉麵">
+            <div class="card-body">
+                <div class="card-title">牛肉麵</div>
+                <div class="card-meta">麵食</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/串燒.jpg" alt="串燒">
+            <div class="card-body">
+                <div class="card-title">串燒</div>
+                <div class="card-meta">肉類</div>
+            </div>
+        </article>
+        
+        
+        <article class="card">
+            <img src="照片/主食/鐵板麵.jpg" alt="鐵板麵">
+            <div class="card-body">
+                <div class="card-title">鐵板麵</div>
+                <div class="card-meta">麵食</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/鐵板燒.jpg" alt="鐵板燒">
+            <div class="card-body">
+                <div class="card-title">鐵板燒</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/部隊鍋.jpg" alt="部隊鍋">
+            <div class="card-body">
+                <div class="card-title">部隊鍋</div>
+                <div class="card-meta">鍋物</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/滷肉飯.jpg" alt="滷肉飯">
+            <div class="card-body">
+                <div class="card-title">滷肉飯</div>
+                <div class="card-meta">米飯</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/雞肉飯.jpg" alt="雞肉飯">
+            <div class="card-body">
+                <div class="card-title">雞肉飯</div>
+                <div class="card-meta">米飯</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/米粉.jpg" alt="米粉">
+            <div class="card-body">
+                <div class="card-title">米粉</div>
+                <div class="card-meta">麵食</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/臭豆腐.jpg" alt="臭豆腐">
+            <div class="card-body">
+                <div class="card-title">臭豆腐</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/義大利麵.jpg" alt="義大利麵">
+            <div class="card-body">
+                <div class="card-title">義大利麵</div>
+                <div class="card-meta">麵食</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/超商微波食品.jpg" alt="超商微波食品">
+            <div class="card-body">
+                <div class="card-title">超商微波食品</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/披薩.jpg" alt="披薩">
+            <div class="card-body">
+                <div class="card-title">披薩</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/炸雞.jpg" alt="炸雞">
+            <div class="card-body">
+                <div class="card-title">炸雞</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/鹽水雞.jpg" alt="鹽水雞">
+            <div class="card-body">
+                <div class="card-title">鹽水雞</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/滷味.jpg" alt="滷味">
+            <div class="card-body">
+                <div class="card-title">滷味</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/便當.jpg" alt="便當">
+            <div class="card-body">
+                <div class="card-title">便當</div>
+                <div class="card-meta">米飯</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/乾拌麵.png" alt="乾拌麵">
+            <div class="card-body">
+                <div class="card-title">乾拌麵</div>
+                <div class="card-meta">麵食</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/永和豆漿.jpg" alt="永和豆漿">
+            <div class="card-body">
+                <div class="card-title">永和豆漿</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/飯糰.jpg" alt="飯糰">
+            <div class="card-body">
+                <div class="card-title">飯糰</div>
+                <div class="card-meta">米飯</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/炸物.jpg" alt="炸物">
+            <div class="card-body">
+                <div class="card-title">炸物</div>
+                <div class="card-meta">其他</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/酸辣粉.jpg" alt="酸辣粉">
+            <div class="card-body">
+                <div class="card-title">酸辣粉</div>
+                <div class="card-meta">麵食</div>
+            </div>
+        </article>
+        
+        <article class="card">
+            <img src="照片/主食/小火鍋.jpg" alt="小火鍋">
+            <div class="card-body">
+                <div class="card-title">小火鍋</div>
+                <div class="card-meta">鍋物</div>
+            </div>
+        </article>
+
+      </div>
+    </section>
+    <footer class="footer">
+        <p>SEE YOU SOON ｜ Y-Five ｜ foodie@gmail.com</p>
+    </footer>
+
+  </main>
+
+    <script>
+    // 按讚系統
+    const LIKE_STORAGE_KEY = 'mainLikes';
+    
+    // 初始化所有卡片的 data-item-id
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            // 如果卡片沒有 data-item-id，則添加
+            if (!card.hasAttribute('data-item-id')) {
+                card.setAttribute('data-item-id', `main-${index + 1}`);
+            }
+            
+            // 如果卡片沒有按讚按鈕，則添加
+            const cardBody = card.querySelector('.card-body');
+            if (cardBody && !cardBody.querySelector('.like-section')) {
+                const likeSection = document.createElement('div');
+                likeSection.className = 'like-section';
+                likeSection.innerHTML = `
+                    <button class="like-btn" aria-label="按讚">
+                        <span class="heart-icon">🤍</span>
+                    </button>
+                    <span class="like-count">0</span>
+                `;
+                cardBody.appendChild(likeSection);
+            }
+        });
+        
+        // 初始化按讚功能
+        initLikeSystem();
+    });
+    
+    function initLikeSystem() {
+        // 從 localStorage 載入按讚數據
+        let likes = JSON.parse(localStorage.getItem(LIKE_STORAGE_KEY) || '{}');
+        
+        // 為每個卡片設置按讚功能
+        document.querySelectorAll('.card').forEach(card => {
+            const itemId = card.getAttribute('data-item-id');
+            if (!itemId) return;
+            
+            const likeBtn = card.querySelector('.like-btn');
+            const likeCount = card.querySelector('.like-count');
+            const heartIcon = card.querySelector('.heart-icon');
+            
+            if (!likeBtn || !likeCount || !heartIcon) return;
+            
+            // 恢復按讚狀態
+            const likeData = likes[itemId] || { count: 0, liked: false };
+            likeCount.textContent = likeData.count;
+            heartIcon.textContent = likeData.liked ? '❤️' : '🤍';
+            if (likeData.liked) {
+                likeBtn.classList.add('liked');
+            }
+            
+            // 按讚按鈕點擊事件
+            likeBtn.addEventListener('click', function(e) {
+                e.stopPropagation(); // 防止觸發卡片翻轉
+                
+                const currentData = likes[itemId] || { count: 0, liked: false };
+                
+                if (currentData.liked) {
+                    // 取消按讚
+                    currentData.count = Math.max(0, currentData.count - 1);
+                    currentData.liked = false;
+                    heartIcon.textContent = '🤍';
+                    likeBtn.classList.remove('liked');
+                } else {
+                    // 按讚
+                    currentData.count++;
+                    currentData.liked = true;
+                    heartIcon.textContent = '❤️';
+                    likeBtn.classList.add('liked');
+                }
+                
+                likes[itemId] = currentData;
+                likeCount.textContent = currentData.count;
+                
+                // 保存到 localStorage
+                localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(likes));
+            });
+        });
+    }
+    
+    // 卡片翻轉效果
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // 如果點擊的是按讚按鈕，不觸發翻轉
+            if (e.target.closest('.like-btn')) {
+                return;
+            }
+            if(!this.classList.contains('highlighting')) {
+                this.classList.toggle('flipped');
+            }
+        });
+    });
+    
+    // 簡單的搜尋與隨機抽選示範
+    const cards = Array.from(document.querySelectorAll('.card'));
+    const grid = document.getElementById('cardGrid');
+    const qInput = document.getElementById('q');
+    const type = document.getElementById('type');
+
+    document.getElementById('searchBtn').addEventListener('click', ()=>{
+        const q = qInput.value.trim().toLowerCase();
+        const t = type.value;
+      
+        let matchCount = 0; // 新增：用來追蹤有多少卡片符合條件
+
+         // 簡單過濾：根據卡片內文字
+        cards.forEach(card=>{
+            const text = card.innerText.toLowerCase();
+            const matchQ = q? text.includes(q) : true;
+            const matchT = t? text.includes(t.toLowerCase()) : true;
+        
+            if(matchQ && matchT){ 
+            card.style.display = '';
+            matchCount++; // 符合條件，計數器加一
+            } else {
+            card.style.display = 'none';
+            }
+            // 重置翻轉狀態
+            card.classList.remove('flipped');
+        });
+        //彈跳視窗
+        if (matchCount === 0) {
+            alert('目前暫無提供相關資訊，請嘗試其他關鍵字。');
+        }
+    });
+
+    document.getElementById('randBtn').addEventListener('click', ()=>{
+        const visible = cards.filter(c=> c.style.display !== 'none');
+        if(visible.length === 0){alert('目前沒有符合的項目'); return}
+        const pick = visible[Math.floor(Math.random()*visible.length)];
+        
+        // 將容器滾到該卡片位置
+        pick.scrollIntoView({behavior:'smooth',block:'center'});
+        
+        // 加個短暫高亮並自動翻轉顯示食譜
+        pick.classList.add('highlighting');
+        pick.style.transition = 'transform 0.3s';
+        pick.style.transform = 'scale(1.05)';
+        
+        setTimeout(() => {
+            pick.classList.add('flipped');
+            pick.style.transform = '';
+            setTimeout(() => {
+                pick.classList.remove('highlighting');
+            }, 500);
+        }, 800);
+    });
+  </script>
+</body>
+</html>
