@@ -83,7 +83,11 @@
 
     /* 使用 grid 兩欄排列，列間縱向延續，『上下滑動』就是容器垂直滾動 */
     .card-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px}
-
+	.card-grid a {
+    		text-decoration: none;   /* 移除底線 */
+    		color: inherit;          /* 文字顏色跟卡片內文字一致 */
+    		display: block;          /* 讓整個 a 變成區塊 */
+	}
     .card{
       background:#fff;
       border-radius:12px;
@@ -411,16 +415,7 @@
                 <div class="card-meta">後餐</div>
             </div>
         </article>
-	
-	<a href= "https://www.sushiro.com.tw/Shop/ShopInfo?shopId=148">
-	<article class="card">
-            <img src="照片/公館/GG1.jpg" alt="GG1">
-            <div class="card-body">
-                <div class="card-title">壽司郎</div>
-                <div class="card-meta">公館</div>
-            </div>
-        </article>
-	</a>	
+
 
 	<article class="card">
             <img src="照片/公館/GG2.jpg" alt="GG2">
