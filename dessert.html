@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -9,49 +6,147 @@
 <title>甜點探索區</title>
 
 <style>
-    /* 核心變更為 school.html 的樣式基礎 */
+    /*字體*/
+    @font-face {
+    font-family: "辰宇落雁體";
+    src: url("ChenYuluoyan-2.0-Thin.ttf") format("truetype");
+    } 
+    
     /* 基本重置 */
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "Helvetica Neue", Arial; background:#fff7fb; color:#333} /* 保留 index.html 的背景色 */
 
-    /* 頁首 - 更改為粉色系 */
-    header{background:#FFC0CB;padding:18px 24px;border-bottom:3px } /* 淺粉色背景 */
+    /* 頁首 */
+    header{
+        background:#faf5f8;
+        box-shadow: 0 2px 10px rgba(139, 111, 71, 0.15);
+        padding:20px 0;
+        border-bottom:3px;
+        /*頁首固定*/
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
     .top-row{display:flex;align-items:center;gap:18px}
-    .logo{font-weight:700;color:#c74385;font-size:30px;font-family:"漢儀新蒂蘇孝慈碑"} /* 深粉色文字 */
+    .logo{padding: 0 20px 15px;font-weight:700;color:#c74385;font-size:40px;font-family:"辰宇落雁體"} /* 深粉色文字 */
 
     /* 圓形分類按鈕 */
-    .categories{display:flex;gap:14px;align-items:center}
-    .cat,.cat1,.cat2,.cat3,.cat4,.cat5,.cat6,.cat7{
-        width:64px;height:64px;border-radius:50%;
-        display:flex;align-items:center;justify-content:center;
+    .categories{display:flex;gap:14px;align-items:center;justify-content: center;flex-wrap: wrap;}
+    .cat{
+        width: 80px; 
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #c74385;
+        color: #c74385;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        cursor: pointer;
+        font-size: 16px;
+        background: linear-gradient(135deg, #fff 0%, #faf8f5 100%);
+        box-shadow: 0 2px 8px rgba(139, 111, 71, 0.1);
+        position: relative;
+        overflow: hidden; 
+    }
+
+    .cat::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        
+        transform: translate(-50%, -50%);
+        transition: width 0.5s, height 0.5s;
+        z-index: -1;
+    }
+    .cat.active{
+        background:#c74385 ;
+        color:#fff ;
         border:3px solid #c74385;
-        color:#c74385;
-        font-weight:700;
+    }
+    .cat{
         text-decoration:none;
         transition:0.25s;
         cursor:pointer;
     }
-
-    .cat.active{
-        background:#c74385;
+    
+    .cat.active:hover{
+        transform:scale(1.15);
+        background:#c74385 ;
         color:#fff;
         border:3px solid #c74385;
     }
+    .cat:hover {
+    transform: scale(1.15); 
+    color: #fff; 
+    }
 
-    /* 彩色 hover 效果 - 為每個分類添加不同顏色 */
-    .cat1:hover{transform:scale(1.1);background:#8B6F47;color:#fff;border:3px solid #8B6F47}
-    .cat2:hover{transform:scale(1.1);background:#F095A7;color:#fff;border:3px solid #F095A7}
-    .cat3:hover{transform:scale(1.1);background:#73E5FC;color:#fff;border:3px solid #73E5FC}
-    .cat:hover,.cat4:hover{transform:scale(1.1);background:#F7EE8F;color:#fff;border:3px solid #F7EE8F}
-    .cat5:hover{transform:scale(1.1);background:#6940AB;color:#fff;border:3px solid #6940AB}
-    .cat6:hover{transform:scale(1.1);background:#FC988F;color:#fff;border:3px solid #FC988F}
-    .cat7:hover{transform:scale(1.1);background:#B4D4BA;color:#fff;border:3px solid #B4D4BA}
+    .cat:hover::before {
+    width: 100%;
+    height: 100%;
+    }
 
-    .cat.active:hover{
-        transform:scale(1.1);
-        background:#c74385;
-        color:#fff;
+    /* 彩色 hover 效果 - 讓 :nth-child 設定各自的 ::before 背景色 */
+    .cat:nth-child(1):hover{
+        transform:scale(1.15);
+        border:3px solid #8B6F47;
+    }
+    .cat:nth-child(1)::before{
+        background:#8B6F47;
+    }
+
+    .cat:nth-child(2):hover{
+    transform:scale(1.15);
+    border:3px solid #F0C22E;
+    }
+    .cat:nth-child(2)::before{
+        background:#F0C22E;
+    }
+
+    .cat:nth-child(3):hover{
+    transform:scale(1.15);
+    border:3px solid #45b3d5;
+    }
+    .cat:nth-child(3)::before{
+        background:#45b3d5;
+    }
+
+    .cat:nth-child(4):hover{
+        transform:scale(1.15);
         border:3px solid #c74385;
+    }
+    .cat:nth-child(4)::before{
+    background:#c74385;
+    }
+
+    .cat:nth-child(5):hover{
+    transform:scale(1.15);
+    border:3px solid #6940AB;
+    }
+    .cat:nth-child(5)::before{
+        background:#6940AB;
+    }
+
+    .cat:nth-child(6):hover{
+        transform:scale(1.15);
+        border:3px solid #CC7304;
+    }
+    .cat:nth-child(6)::before{
+        background:#CC7304;
+    }
+
+    .cat:nth-child(7):hover{
+        transform:scale(1.15);
+        border:3px solid #40754A;
+    }
+    .cat:nth-child(7)::before{
+        background:#40754A;
     }
 
     /* 篩選列 */
@@ -83,7 +178,7 @@
     }
 
     /* 使用 grid 兩欄排列，列間縱向延續 */
-    .card-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px}
+    .card-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:16px}
 
     /* 卡片 */
     .card{
@@ -98,6 +193,8 @@
     
     .card:hover{
       transform:translateY(-8px);
+      box-shadow: 0 8px 20px rgba(105,64,171,0.2);
+
     }
     
     .card-inner{
@@ -136,7 +233,7 @@
       overflow-y:auto;
     }
     
-    .card img{width:100%;height:300px;object-fit:cover;display:block}
+    .card img{width:100%;min-height:200px;height:70vw;max-height:300px;;object-fit:cover;display:block}
     .card-body{padding:12px;text-align:center;position:relative;}
     .card-title{font-weight:700;margin-bottom:6px;color:#c74385;}
     .card-meta{color:#8a8a8a;font-size:13px}
@@ -179,10 +276,10 @@
         text-align:center;
         padding:12px;
         margin-top:20px;
-        background:#FFC0CB;
-        color:#4a4a4a;
+        background:#c74385;
+        color:white;
         font-size:14px;
-        border-top:2px solid #c74385;
+        letter-spacing: 1px;
     }
 
 </style>
@@ -193,26 +290,24 @@
         <div class="top-row">
             <div class="logo">今天吃什麼？</div>
         </div>
+		<nav class="categories" aria-label="分類">
+            <a href="index.html" class="cat">首頁</a>
+            <a href="main.html" class="cat">主食</a>
+            <a href="drink.html" class="cat">飲品</a>
+            <a href="dessert.html" class="cat active">甜點</a>
+            <a href="weird.html" class="cat">怪奇</a>
+            <a href="foreign.html" class="cat">異國</a>
+            <a href="school.html" class="cat">公館</a> 
+        </nav>
     </header>
 
     <main>
         <section class="hero">
             <h1>🍰甜點探索區🍰</h1>
 
-            <div>
-                <nav class="categories" aria-label="分類">
-                    <a href="index.html" class="cat1">首頁</a>
-                    <a href="main.html" class="cat2">主食</a>
-                    <a href="drink.html" class="cat3">飲品</a>
-                    <a href="dessert.html" class="cat active">甜點</a>
-                    <a href="weird.html" class="cat5">怪奇</a>
-                    <a href="foreign.html" class="cat6">異國</a>
-                    <a href="school.html" class="cat7">公館</a> </nav>
-            </div>
-
             <div class="filters">
                 <select id="filterTaste">
-                    <option value="">依口味篩選</option>
+                    <option value="">全部口味</option>
                     <option value="甜">甜</option>
                     <option value="酸">酸</option>
                     <option value="巧克力">巧克力</option>
@@ -221,7 +316,7 @@
                 </select>
 
                 <select id="filterType">
-                    <option value="">依類型篩選</option>
+                    <option value="">全部種類</option>
                     <option value="蛋糕">蛋糕</option>
                     <option value="餅乾">餅乾</option>
                     <option value="冰品">冰品</option>
@@ -493,6 +588,9 @@
             (taste === "" || d.taste === taste) &&
             (type === "" || d.type === type)
         );
+		if (filtered.length === 0) {
+         alert('目前暫無提供相關資訊，請嘗試其他篩選條件。');
+        }
 
         renderDesserts(filtered);
     }
@@ -501,6 +599,9 @@
     function searchDessert() {
         const keyword = document.getElementById("searchInput").value.trim();
         const filtered = dessertList.filter(d => d.name.includes(keyword));
+        if (filtered.length === 0) {
+            alert('目前暫無提供相關資訊，請嘗試其他關鍵字。');
+        }
         renderDesserts(filtered);
     }
 
@@ -510,23 +611,22 @@
         const filtered = visibleCards.filter(c => c.style.display !== 'none');
         
         if(filtered.length === 0){alert('目前沒有符合的項目'); return}
-        
         const pick = filtered[Math.floor(Math.random()*filtered.length)];
+        // 取得內層卡片正面元素
+        const cardFront = pick.querySelector('.card-front');
+
         // 將容器滾到該卡片位置
         pick.scrollIntoView({behavior:'smooth',block:'center'});
         
-        // 加個短暫高亮並自動翻轉顯示資訊
-        pick.classList.add('highlighting');
-        pick.style.transition = 'transform 0.3s';
-        pick.style.transform = 'scale(1.05)';
-        
+        // 加個短暫高亮
+        pick.style.transition = 'box-shadow 1.0s, background 1.0s';
+        cardFront.style.background ="rgba(255, 194, 204,0.4)";
+        pick.style.boxShadow = '0 8px 30px rgba(110,100,125,0.4)';
+
         setTimeout(() => {
-            pick.classList.add('flipped');
-            pick.style.transform = '';
-            setTimeout(() => {
-                pick.classList.remove('highlighting');
-            }, 500);
-        }, 800);
+            pick.style.boxShadow = '';
+            cardFront.style.background = '';
+        }, 1500);
     }
 </script>
 
