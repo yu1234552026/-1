@@ -683,6 +683,9 @@
         const matchT = t ? meta.includes(t) : true;
         
         const shouldShow = matchQ && matchT;
+		if (shouldShow) {
+      		matchCount++;
+    	}
         // 同時處理卡片和其父元素（可能是 <a> 標籤）
         const parent = card.parentElement;
         if (parent.tagName === 'A') {
